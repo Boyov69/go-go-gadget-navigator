@@ -1,9 +1,11 @@
 
 import { useState, useEffect, MutableRefObject } from 'react';
-import { mapStyles, MapStyleName } from './mapStyles';
+import { mapStyles } from './mapStyles';
+import type { MapStyleName } from './mapStyles';
 import { initializeGoogleMapsScript, createMapInstance } from './mapInitializer';
 
-export { MapStyleName } from './mapStyles';
+// Export the MapStyleName type correctly
+export type { MapStyleName } from './mapStyles';
 
 interface MapInitializerOptions {
   center: { lat: number; lng: number };

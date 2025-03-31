@@ -169,4 +169,5 @@ export const mapStyles = {
   ]
 };
 
+// Fix the export type when 'isolatedModules' is enabled
 export type MapStyleName = keyof typeof mapStyles;

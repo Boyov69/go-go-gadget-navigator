@@ -25,13 +25,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
   const menuItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: Map, label: "Explore", path: "/" },
-    { icon: Compass, label: "Navigate", path: "/" },
-    { icon: BookMarked, label: "Saved Trips", path: "/" },
+    { icon: Map, label: "Explore", path: "/explore" },
+    { icon: Compass, label: "Navigate", path: "/navigate" },
+    { icon: BookMarked, label: "Saved Trips", path: "/saved-trips" },
     { icon: Package, label: "Cargo", path: "/cargo" },
     { icon: Building, label: "Providers", path: "/suppliers" },
-    { icon: Heart, label: "Favorites", path: "/" },
-    { icon: Settings, label: "Settings", path: "/" },
+    { icon: Heart, label: "Favorites", path: "/favorites" },
+    { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
   return (
