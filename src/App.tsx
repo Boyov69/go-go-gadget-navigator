@@ -2,8 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Suppliers from "./pages/Suppliers";
 import Cargo from "./pages/Cargo";
@@ -19,75 +18,63 @@ import SavedTripsPage from "./pages/SavedTrips";
 import FavoritesPage from "./pages/Favorites";
 import AdminDashboard from "./pages/AdminDashboard";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 30 * 1000,
-    },
-  },
-});
-
+// Removed the duplicate QueryClient since it's already in main.tsx
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/navigate" element={<NavigatePage />} />
+  <TooltipProvider>
+    <AuthProvider>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Index />} />
+        <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/navigate" element={<NavigatePage />} />
 
-            {/* User routes */}
-            <Route path="/saved-trips" element={<SavedTripsPage />} />
-            <Route path="/suppliers" element={<Suppliers />} />
-            <Route path="/cargo" element={<Cargo />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+        {/* User routes */}
+        <Route path="/saved-trips" element={<SavedTripsPage />} />
+        <Route path="/suppliers" element={<Suppliers />} />
+        <Route path="/cargo" element={<Cargo />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
 
-            {/* Admin routes */}
-            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <AdminGuard requiredRole={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
-                  <AdminDashboard />
-                </AdminGuard>
-              } 
-            />
+        {/* Admin routes */}
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <AdminGuard requiredRole={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+              <AdminDashboard />
+            </AdminGuard>
+          } 
+        />
 
-            {/* Super Admin routes */}
-            <Route path="/super-admin" element={<Navigate to="/super-admin/dashboard" replace />} />
-            <Route 
-              path="/super-admin/dashboard" 
-              element={
-                <AdminGuard requiredRole={UserRole.SUPER_ADMIN}>
-                  <SuperAdminDashboard />
-                </AdminGuard>
-              } 
-            />
+        {/* Super Admin routes */}
+        <Route path="/super-admin" element={<Navigate to="/super-admin/dashboard" replace />} />
+        <Route 
+          path="/super-admin/dashboard" 
+          element={
+            <AdminGuard requiredRole={UserRole.SUPER_ADMIN}>
+              <SuperAdminDashboard />
+            </AdminGuard>
+          } 
+        />
 
-            {/* Provider routes */}
-            <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
-            <Route 
-              path="/provider/dashboard" 
-              element={
-                <AdminGuard requiredRole={UserRole.PROVIDER}>
-                  <Index />
-                </AdminGuard>
-              } 
-            />
+        {/* Provider routes */}
+        <Route path="/provider" element={<Navigate to="/provider/dashboard" replace />} />
+        <Route 
+          path="/provider/dashboard" 
+          element={
+            <AdminGuard requiredRole={UserRole.PROVIDER}>
+              <Index />
+            </AdminGuard>
+          } 
+        />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AuthProvider>
+  </TooltipProvider>
 );
 
 export default App;
