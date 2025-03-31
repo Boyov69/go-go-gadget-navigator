@@ -7,9 +7,10 @@ import { Link, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   toggleSidebar: () => void;
+  children?: React.ReactNode;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -56,6 +57,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
           <Button size="sm" asChild>
             <Link to="/suppliers">Providers</Link>
           </Button>
+          {children}
         </div>
       </div>
     </header>
