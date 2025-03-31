@@ -11,16 +11,19 @@ import SavedAddresses from "@/components/SavedAddresses";
 import RideHistory from "@/components/RideHistory";
 import EmergencyButton from "@/components/EmergencyButton";
 import GoogleMap from "@/components/GoogleMap";
+import LocalTransportInfo from "@/components/LocalTransportInfo";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Sample locations for the map
+  // Sample locations for the map - updated for Belgian cities
   const popularLocations = [
-    { position: { lat: 51.50, lng: -0.09 }, title: "City Center" },
-    { position: { lat: 51.51, lng: -0.08 }, title: "Business District" },
-    { position: { lat: 51.49, lng: -0.10 }, title: "Shopping Mall" },
+    { position: { lat: 50.8503, lng: 4.3517 }, title: "Brussels" },
+    { position: { lat: 51.2194, lng: 4.4025 }, title: "Antwerp" },
+    { position: { lat: 51.0543, lng: 3.7174 }, title: "Ghent" },
+    { position: { lat: 50.6326, lng: 5.5797 }, title: "Liège" },
+    { position: { lat: 51.3097, lng: 3.2340 }, title: "Bruges" },
   ];
   
   const toggleSidebar = () => {
@@ -35,30 +38,37 @@ const Index: React.FC = () => {
         <Navbar toggleSidebar={toggleSidebar} />
         
         <main className="container px-4 py-6 md:py-8 mx-auto animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main content - 2 columns wide */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {/* Left column */}
+            <div className="md:col-span-1 space-y-6">
+              <QuickTools />
+              <RideHistory />
+            </div>
+            
+            {/* Center column with map - largest component */}
+            <div className="md:col-span-3 space-y-6">
               <Card className="shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xl">Explore Nearby</CardTitle>
+                  <CardTitle className="text-xl">Explore Belgium</CardTitle>
                 </CardHeader>
                 <GoogleMap 
                   markers={popularLocations}
-                  height="400px"
-                  center={{ lat: 51.505, lng: -0.09 }}
-                  zoom={13}
+                  height="500px"
+                  center={{ lat: 50.8503, lng: 4.3517 }}
+                  zoom={8}
                 />
               </Card>
-              <QuickTools />
+              
+              {/* New Local Transport Info component */}
+              <LocalTransportInfo />
+              
               <RideBooking />
-              <PopularDestinations />
-              <SavedAddresses />
             </div>
             
-            {/* Side panel - 1 column wide */}
-            <div className="space-y-6">
+            {/* Right column */}
+            <div className="md:col-span-1 space-y-6">
               <PlanTripCard />
-              <RideHistory />
+              <SavedAddresses />
               <RecentTrips />
             </div>
           </div>
