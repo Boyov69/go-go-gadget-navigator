@@ -6,7 +6,6 @@ import SupplierRegistration from "@/components/SupplierRegistration";
 import SupplierDashboard from "@/components/SupplierDashboard";
 import ProviderSearch from "@/components/ProviderSearch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FloatingNavigation from "@/components/FloatingNavigation";
 
 const Suppliers: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -22,9 +21,6 @@ const Suppliers: React.FC = () => {
       
       <div className="flex-1">
         <Navbar toggleSidebar={toggleSidebar} />
-        
-        {/* Add FloatingNavigation component */}
-        <FloatingNavigation />
         
         <main className="container px-4 py-6 md:py-8 mx-auto animate-fade-in pb-20 md:pb-6">
           <h1 className="text-2xl font-bold mb-6">Transportation Service Providers</h1>

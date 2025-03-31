@@ -14,7 +14,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import GlobalCoverage from "@/components/GlobalCoverage";
 import LanguageSelector from "@/components/LanguageSelector";
 import DriverRating from "@/components/driver/DriverRating";
-import FloatingNavigation from "@/components/FloatingNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/services/auth";
 import { Button } from "@/components/ui/button";
@@ -113,9 +112,6 @@ const Index: React.FC = () => {
             onLanguageChange={handleLanguageChange}
           />
         </Navbar>
-        
-        {/* Add FloatingNavigation component */}
-        <FloatingNavigation />
         
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 pb-20 md:pb-6">
           {/* Quick Tools at the top - more visible */}
