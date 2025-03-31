@@ -4,31 +4,27 @@ import GoogleMap from "./GoogleMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const MapSection: React.FC = () => {
-  const [defaultCenter] = useState({ lat: 50.8476, lng: 4.3572 }); // Brussels coordinates
+  const [defaultCenter] = useState({ lat: 51.505, lng: -0.09 });
   
-  // Sample nearby locations in Belgium
+  // Sample nearby locations
   const markers = [
-    { position: { lat: 50.8476, lng: 4.3572 }, title: "Brussels" },
-    { position: { lat: 51.2194, lng: 4.4025 }, title: "Antwerp" },
-    { position: { lat: 50.4496, lng: 3.8174 }, title: "Mons" },
-    { position: { lat: 51.0543, lng: 3.7174 }, title: "Ghent" },
-    { position: { lat: 50.6326, lng: 5.5797 }, title: "Liège" },
-    { position: { lat: 51.1667, lng: 5.3833 }, title: "Lommel" },
+    { position: { lat: 51.51, lng: -0.08 }, title: "Destination 1" },
+    { position: { lat: 51.49, lng: -0.1 }, title: "Destination 2" },
+    { position: { lat: 51.505, lng: -0.11 }, title: "Destination 3" },
   ];
 
   return (
-    <Card className="shadow-sm h-full">
+    <Card className="shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl">Belgian Transport Map</CardTitle>
+        <CardTitle className="text-xl">Explore Nearby</CardTitle>
       </CardHeader>
-      <CardContent className="p-0 h-[calc(100%-4rem)]">
+      <CardContent className="p-0">
         <GoogleMap 
           center={defaultCenter}
           markers={markers}
-          height="100%"
+          height="400px"
           showControls={true}
           mapStyle="retro"
-          zoom={8}
         />
       </CardContent>
     </Card>
