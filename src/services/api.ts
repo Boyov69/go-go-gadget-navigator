@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { UserRole } from './auth';
 
 // Create an axios instance with default configuration
 const api = axios.create({
@@ -68,7 +69,7 @@ const apiService = {
     return api.post('/auth/login', { email, password });
   },
   
-  register: (userData: { email: string; password: string; name: string }) => {
+  register: (userData: { email: string; password: string; name: string; role?: UserRole }) => {
     return api.post('/auth/register', userData);
   },
   
@@ -79,6 +80,61 @@ const apiService = {
   
   updateUserProfile: (profileData: any) => {
     return api.put('/user/profile', profileData);
+  },
+  
+  // Admin - User Management
+  getAllUsers: (filters?: any) => {
+    return api.get('/admin/users', { params: filters });
+  },
+  
+  getUserById: (userId: string) => {
+    return api.get(`/admin/users/${userId}`);
+  },
+  
+  createUser: (userData: any) => {
+    return api.post('/admin/users', userData);
+  },
+  
+  updateUser: (userId: string, userData: any) => {
+    return api.put(`/admin/users/${userId}`, userData);
+  },
+  
+  deleteUser: (userId: string) => {
+    return api.delete(`/admin/users/${userId}`);
+  },
+  
+  // Admin - Provider Management
+  getAllProviders: (filters?: any) => {
+    return api.get('/admin/providers', { params: filters });
+  },
+  
+  approveProvider: (providerId: string) => {
+    return api.post(`/admin/providers/${providerId}/approve`);
+  },
+  
+  rejectProvider: (providerId: string, reason?: string) => {
+    return api.post(`/admin/providers/${providerId}/reject`, { reason });
+  },
+  
+  suspendProvider: (providerId: string, reason?: string) => {
+    return api.post(`/admin/providers/${providerId}/suspend`, { reason });
+  },
+  
+  // Admin - Analytics
+  getDashboardStats: () => {
+    return api.get('/admin/stats/dashboard');
+  },
+  
+  getUserStats: (params?: any) => {
+    return api.get('/admin/stats/users', { params });
+  },
+  
+  getProviderStats: (params?: any) => {
+    return api.get('/admin/stats/providers', { params });
+  },
+  
+  getTripStats: (params?: any) => {
+    return api.get('/admin/stats/trips', { params });
   },
   
   // Trips and rides
