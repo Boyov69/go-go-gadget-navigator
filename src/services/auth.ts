@@ -1,6 +1,5 @@
 
-import { toast } from "@/components/ui/use-toast";
-import apiService from "./api";
+import { toast } from "@/hooks/use-toast";
 
 // User roles enum
 export enum UserRole {
@@ -20,6 +19,34 @@ export interface User {
   role: UserRole;
   permissions?: string[];
 }
+
+// Mock user data for demo purposes
+const mockUsers = {
+  "superadmin@example.com": {
+    id: "sa-001",
+    name: "Super Admin",
+    email: "superadmin@example.com",
+    role: UserRole.SUPER_ADMIN,
+    permissions: ["all"],
+    avatar: "https://i.pravatar.cc/150?u=superadmin"
+  },
+  "admin@example.com": {
+    id: "adm-001",
+    name: "Admin User",
+    email: "admin@example.com",
+    role: UserRole.ADMIN,
+    permissions: ["manage_users", "manage_content"],
+    avatar: "https://i.pravatar.cc/150?u=admin"
+  },
+  "user@example.com": {
+    id: "usr-001",
+    name: "Regular User",
+    email: "user@example.com",
+    role: UserRole.REGISTERED_USER,
+    permissions: ["view_content"],
+    avatar: "https://i.pravatar.cc/150?u=user"
+  }
+};
 
 // Authentication service
 const authService = {
@@ -70,12 +97,14 @@ const authService = {
         return JSON.parse(storedUser);
       }
       
-      // If no stored user but has token, fetch from API
+      // If no stored user but has token, use mock data (for demo)
       if (authService.isAuthenticated()) {
-        const response = await apiService.getUserProfile();
-        const userData = response.data;
-        localStorage.setItem('user', JSON.stringify(userData));
-        return userData;
+        const email = localStorage.getItem('lastEmail');
+        if (email && mockUsers[email as keyof typeof mockUsers]) {
+          const userData = mockUsers[email as keyof typeof mockUsers];
+          localStorage.setItem('user', JSON.stringify(userData));
+          return userData;
+        }
       }
       
       return null;
@@ -85,14 +114,30 @@ const authService = {
     }
   },
   
-  // Login
+  // Login (simulated for demo)
   login: async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await apiService.login(email, password);
-      const { token, user } = response.data;
+      // For demo purposes, we'll accept any non-empty password
+      if (!email || !password) {
+        throw new Error("Email and password are required");
+      }
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Check if the email exists in our mock data
+      const user = mockUsers[email as keyof typeof mockUsers];
+      
+      if (!user) {
+        throw new Error("User not found");
+      }
+      
+      // Simulate successful login
+      const token = "demo-auth-token-" + Math.random().toString(36).substring(2);
       
       localStorage.setItem('authToken', token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('lastEmail', email);
       
       toast({
         title: "Login successful",
@@ -113,14 +158,36 @@ const authService = {
     }
   },
   
-  // Register
+  // Register (simulated for demo)
   register: async (name: string, email: string, password: string, role: UserRole = UserRole.REGISTERED_USER): Promise<boolean> => {
     try {
-      const response = await apiService.register({ name, email, password, role });
-      const { token, user } = response.data;
+      if (!name || !email || !password) {
+        throw new Error("Name, email, and password are required");
+      }
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Create a new user
+      const newUser: User = {
+        id: "user-" + Math.random().toString(36).substring(2),
+        name,
+        email,
+        role,
+        permissions: role === UserRole.SUPER_ADMIN ? ["all"] : 
+                   role === UserRole.ADMIN ? ["manage_users", "manage_content"] : 
+                   ["view_content"],
+        avatar: `https://i.pravatar.cc/150?u=${email}`
+      };
+      
+      const token = "demo-auth-token-" + Math.random().toString(36).substring(2);
       
       localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('lastEmail', email);
+      
+      // Add the new user to our mock data
+      (mockUsers as any)[email] = newUser;
       
       toast({
         title: "Registration successful",
@@ -150,9 +217,6 @@ const authService = {
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
-    
-    // Redirect to home page
-    window.location.href = '/';
   }
 };
 

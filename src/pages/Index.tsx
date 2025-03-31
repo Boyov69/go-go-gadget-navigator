@@ -68,16 +68,36 @@ const Index: React.FC = () => {
     // In a real app, you would update translations here
   };
 
-  // Test login as super admin
+  // Test login functions for different user roles
   const loginAsSuperAdmin = async () => {
-    // In a real app, you wouldn't hardcode credentials
-    // This is just for demo purposes
     const success = await login("superadmin@example.com", "password123");
     
     if (success) {
       toast({
         title: "Logged in as Super Admin",
         description: "You now have access to the Super Admin Dashboard",
+      });
+    }
+  };
+  
+  const loginAsAdmin = async () => {
+    const success = await login("admin@example.com", "password123");
+    
+    if (success) {
+      toast({
+        title: "Logged in as Admin",
+        description: "You now have access to the Admin Dashboard",
+      });
+    }
+  };
+  
+  const loginAsUser = async () => {
+    const success = await login("user@example.com", "password123");
+    
+    if (success) {
+      toast({
+        title: "Logged in as Regular User",
+        description: "Welcome back!",
       });
     }
   };
@@ -111,16 +131,42 @@ const Index: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="mb-3 text-sm text-muted-foreground">
-                  For demonstration purposes only. Click below to login as a Super Admin user.
+                  For demonstration purposes only. Click below to login as different user types.
                 </p>
-                <Button onClick={loginAsSuperAdmin} className="mr-2">
-                  Login as Super Admin
-                </Button>
-                {user && (
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={loginAsSuperAdmin} className="bg-purple-700 hover:bg-purple-800">
+                    Login as Super Admin
+                  </Button>
+                  <Button onClick={loginAsAdmin} className="bg-blue-600 hover:bg-blue-700">
+                    Login as Admin
+                  </Button>
+                  <Button onClick={loginAsUser} variant="outline">
+                    Login as Regular User
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* User info card - Only shown when logged in */}
+          {user && (
+            <Card className="mb-6 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-green-500"></span>
+                  Logged in as {user.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Role: {user.role}</p>
+                    <p className="text-sm text-muted-foreground">Email: {user.email}</p>
+                  </div>
                   <Button variant="outline" onClick={logout}>
                     Logout
                   </Button>
-                )}
+                </div>
               </CardContent>
             </Card>
           )}
