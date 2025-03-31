@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
 import AdminGuard from "./components/guards/AdminGuard";
 import { UserRole } from "./services/auth";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +63,16 @@ const App = () => (
                 <AdminGuard requiredRole={UserRole.PROVIDER}>
                   {/* We'll create the provider components later */}
                   <Navigate to="/provider/dashboard" replace />
+                </AdminGuard>
+              } 
+            />
+
+            {/* Super Admin Dashboard */}
+            <Route 
+              path="/super-admin/dashboard" 
+              element={
+                <AdminGuard requiredRole={UserRole.SUPER_ADMIN}>
+                  <SuperAdminDashboard />
                 </AdminGuard>
               } 
             />
