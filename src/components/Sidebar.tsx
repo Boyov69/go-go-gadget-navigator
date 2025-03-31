@@ -13,7 +13,8 @@ import {
   Building,
   Package,
   ChevronLeft,
-  LayoutDashboard
+  LayoutDashboard,
+  Crown  // New import for super admin icon
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -48,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   
   // Super admin menu items
   const superAdminMenuItems = [
-    { icon: LayoutDashboard, label: "Super Admin", path: "/super-admin/dashboard" },
+    { icon: Crown, label: "Super Admin Dashboard", path: "/super-admin/dashboard" },
   ];
   
   // Combine menu items based on user role
