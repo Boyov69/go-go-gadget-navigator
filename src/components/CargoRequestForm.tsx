@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Package, Calendar, MapPin, Truck, Clock, Info, AlertCircle } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Package, Calendar, MapPin, Truck, Clock, Info, AlertCircle, Zap, Timer } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 const CargoRequestForm: React.FC = () => {
   const { toast } = useToast();
@@ -18,6 +20,7 @@ const CargoRequestForm: React.FC = () => {
   const [time, setTime] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [serviceType, setServiceType] = useState<string>("standard");
+  const [deliveryType, setDeliveryType] = useState<string>("standard");
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +37,7 @@ const CargoRequestForm: React.FC = () => {
     
     toast({
       title: "Cargo Request Submitted",
-      description: "Your cargo delivery request has been submitted successfully",
+      description: `Your ${deliveryType} cargo delivery request has been submitted successfully`,
       duration: 3000,
     });
     
@@ -45,7 +48,43 @@ const CargoRequestForm: React.FC = () => {
     setTime("");
     setDescription("");
     setServiceType("standard");
+    setDeliveryType("standard");
   };
+
+  const deliveryTypes = [
+    {
+      id: "standard",
+      name: "Standard",
+      description: "Delivery within 1-2 business days",
+      icon: <Truck className="h-4 w-4" />,
+      price: "₴100",
+      badge: "bg-blue-100 text-blue-800"
+    },
+    {
+      id: "express",
+      name: "Express",
+      description: "Same-day delivery",
+      icon: <Clock className="h-4 w-4" />,
+      price: "₴250",
+      badge: "bg-amber-100 text-amber-800"
+    },
+    {
+      id: "urgent",
+      name: "Urgent",
+      description: "Delivery within 2 hours",
+      icon: <Zap className="h-4 w-4" />,
+      price: "₴500",
+      badge: "bg-red-100 text-red-800"
+    },
+    {
+      id: "scheduled",
+      name: "Scheduled",
+      description: "Choose specific time window",
+      icon: <Timer className="h-4 w-4" />,
+      price: "₴150",
+      badge: "bg-green-100 text-green-800"
+    },
+  ];
   
   return (
     <Card>
@@ -63,7 +102,48 @@ const CargoRequestForm: React.FC = () => {
           </TabsList>
           
           <TabsContent value="singleItem">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Delivery Type Selection */}
+              <div className="rounded-md border border-border p-4 space-y-4">
+                <h3 className="font-medium flex items-center gap-2">
+                  <Zap className="h-5 w-5" /> 
+                  Delivery Type
+                </h3>
+                
+                <RadioGroup 
+                  value={deliveryType} 
+                  onValueChange={setDeliveryType}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                >
+                  {deliveryTypes.map((type) => (
+                    <div key={type.id} className="relative">
+                      <RadioGroupItem 
+                        value={type.id} 
+                        id={`delivery-${type.id}`}
+                        className="absolute top-4 left-4 z-10"
+                      />
+                      <Label
+                        htmlFor={`delivery-${type.id}`}
+                        className={`flex flex-col h-full p-4 rounded-md border-2 ${
+                          deliveryType === type.id 
+                            ? 'border-primary bg-accent/20' 
+                            : 'border-muted hover:border-muted-foreground/50'
+                        } cursor-pointer`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {type.icon} 
+                            <span className="font-medium">{type.name}</span>
+                          </div>
+                          <Badge variant="outline" className={type.badge}>{type.price}</Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{type.description}</span>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="pickupAddress" className="flex items-center gap-2">
