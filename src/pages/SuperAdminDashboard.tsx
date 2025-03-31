@@ -12,7 +12,7 @@ import {
   Globe 
 } from 'lucide-react';
 
-import { AdminGuard } from '@/components/guards/AdminGuard';
+import AdminGuard from '@/components/guards/AdminGuard';
 import { UserRole } from '@/services/auth';
 import { useAuth } from '@/hooks/useAuth';
 
