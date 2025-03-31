@@ -67,25 +67,32 @@ const Index = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+          {/* New layout with map in the center as the largest component */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 animate-fade-in">
             
-            {/* First column */}
-            <div className="flex flex-col gap-6">
+            {/* Left column - 1 column width */}
+            <div className="lg:col-span-1 flex flex-col gap-6">
               <PlanTripCard />
               <SavedAddresses />
               <RecentTrips />
             </div>
             
-            <div className="flex flex-col gap-6">
-              <RideBooking />
-              <EmergencyButton />
-              <BelgianTaxiServices />
+            {/* Center column with map - 3 columns width */}
+            <div className="lg:col-span-3 flex flex-col gap-6">
+              <div className="h-[700px]">
+                <MapSection />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <EmergencyButton />
+                <QuickTools />
+              </div>
             </div>
             
+            {/* Right column - 1 column width */}
             <div className="lg:col-span-1 flex flex-col gap-6">
-              <MapSection />
-              <QuickTools />
+              <RideBooking />
               <PopularDestinations />
+              <BelgianTaxiServices />
             </div>
           </div>
         </main>
