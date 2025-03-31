@@ -11,6 +11,7 @@ declare namespace google {
       constructor(mapDiv: Element, options?: MapOptions);
       setCenter(latLng: LatLng | LatLngLiteral): void;
       setZoom(zoom: number): void;
+      setOptions(options: MapOptions): void;
       addListener(eventName: string, handler: Function): MapsEventListener;
       getZoom(): number;
     }
