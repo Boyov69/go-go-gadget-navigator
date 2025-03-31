@@ -14,6 +14,7 @@ import {
   Package,
   ChevronLeft 
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const { logout } = useAuth();
 
   const menuItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -33,6 +35,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { icon: Heart, label: "Favorites", path: "/favorites" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <>
@@ -95,6 +101,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <Button 
               variant="outline" 
               className={`w-full flex items-center gap-2 ${!isOpen && "md:p-2 md:justify-center"}`}
+              onClick={handleLogout}
+              title="Uitloggen"
             >
               <LogOut className="h-4 w-4" />
               {isOpen && "Logout"}
