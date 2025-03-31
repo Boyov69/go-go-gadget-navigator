@@ -12,7 +12,8 @@ import {
   Share2,
   Car,
   Clock,
-  Building
+  Building,
+  Package
 } from "lucide-react";
 
 const QuickTools: React.FC = () => {
@@ -24,7 +25,7 @@ const QuickTools: React.FC = () => {
     { icon: MapPin, label: "Saved Places", color: "bg-blue-100", action: "Viewing saved places" },
     { icon: Search, label: "Search", color: "bg-teal-100", action: "Search activated" },
     { icon: Car, label: "Book Ride", color: "bg-blue-100", action: "Opening ride booking" },
-    { icon: Clock, label: "Schedule", color: "bg-teal-100", action: "Opening ride scheduler" },
+    { icon: Package, label: "Cargo Delivery", color: "bg-orange-100", isLink: true, to: "/cargo" },
     { icon: Building, label: "For Providers", color: "bg-amber-100", isLink: true, to: "/suppliers" },
   ];
 
