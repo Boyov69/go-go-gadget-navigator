@@ -6,6 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { MapPin, Navigation, Star, Phone, MessageSquare, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import GoogleMap from "./GoogleMap";
 
 interface DriverInfo {
   id: string;
@@ -29,12 +30,27 @@ const LiveDriverTracking: React.FC = () => {
   const { toast } = useToast();
   const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPosition, setCurrentPosition] = useState({ x: 20, y: 50 }); // For animation
+  const [driverMarker, setDriverMarker] = useState<{ 
+    position: { lat: number; lng: number };
+    title: string;
+  } | null>(null);
+  
+  // Destination marker is fixed
+  const destinationMarker = {
+    position: { lat: 51.515, lng: -0.09 },
+    title: "Destination"
+  };
+  
+  // Starting point marker is fixed
+  const startingMarker = {
+    position: { lat: 51.495, lng: -0.11 },
+    title: "Pick-up Location"
+  };
 
   // Simulate fetching driver data
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDriverInfo({
+      const newDriverInfo = {
         id: "drv-12345",
         name: "Alex Johnson",
         photo: "/placeholder.svg",
@@ -48,8 +64,14 @@ const LiveDriverTracking: React.FC = () => {
         distance: 2.3,
         location: {
           lat: 51.505,
-          lng: -0.09,
+          lng: -0.11,
         },
+      };
+      
+      setDriverInfo(newDriverInfo);
+      setDriverMarker({
+        position: newDriverInfo.location,
+        title: `${newDriverInfo.name} - ${newDriverInfo.vehicle.model}`
       });
       setIsLoading(false);
     }, 1500);
@@ -59,24 +81,34 @@ const LiveDriverTracking: React.FC = () => {
 
   // Simulate driver movement
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !driverInfo) return;
 
     const interval = setInterval(() => {
-      setCurrentPosition(prev => ({
-        x: prev.x + (Math.random() * 2 - 1) * 2,
-        y: Math.max(10, Math.min(80, prev.y - 1)),
-      }));
-
-      if (driverInfo) {
-        setDriverInfo(prev => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            eta: Math.max(0, prev.eta - 0.2),
-            distance: Math.max(0, prev.distance - 0.05),
-          };
+      // Simulate movement towards destination
+      setDriverInfo(prev => {
+        if (!prev) return prev;
+        
+        const newLat = prev.location.lat + (destinationMarker.position.lat - prev.location.lat) * 0.05;
+        const newLng = prev.location.lng + (destinationMarker.position.lng - prev.location.lng) * 0.05;
+        
+        const newLocation = {
+          lat: newLat,
+          lng: newLng
+        };
+        
+        // Update driver marker position for the map
+        setDriverMarker({
+          position: newLocation,
+          title: `${prev.name} - ${prev.vehicle.model}`
         });
-      }
+        
+        return {
+          ...prev,
+          eta: Math.max(0, prev.eta - 0.2),
+          distance: Math.max(0, prev.distance - 0.05),
+          location: newLocation
+        };
+      });
     }, 2000);
 
     return () => clearInterval(interval);
@@ -122,6 +154,8 @@ const LiveDriverTracking: React.FC = () => {
     );
   }
 
+  const allMarkers = [startingMarker, destinationMarker].filter(Boolean);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -163,51 +197,14 @@ const LiveDriverTracking: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative h-40 bg-accent/30 rounded-md overflow-hidden">
-              {/* Simplified map visualization */}
-              <div className="absolute inset-0">
-                <div className="grid grid-cols-10 grid-rows-10 h-full w-full opacity-20">
-                  {[...Array(10)].map((_, rowIndex) =>
-                    [...Array(10)].map((_, colIndex) => (
-                      <div
-                        key={`${rowIndex}-${colIndex}`}
-                        className="border border-accent"
-                      />
-                    ))
-                  )}
-                </div>
-                {/* Destination marker */}
-                <div className="absolute top-[10%] right-[20%]">
-                  <MapPin className="h-5 w-5 text-primary" />
-                </div>
-                {/* Starting point marker */}
-                <div className="absolute bottom-[20%] left-[20%]">
-                  <MapPin className="h-5 w-5 text-blue-500" />
-                </div>
-                {/* Driver marker */}
-                <div
-                  className="absolute"
-                  style={{
-                    left: `${currentPosition.x}%`,
-                    bottom: `${currentPosition.y}%`,
-                    transition: "all 1s ease-in-out",
-                  }}
-                >
-                  <div className="h-6 w-6 bg-primary text-white rounded-full flex items-center justify-center">
-                    <Navigation className="h-3 w-3" />
-                  </div>
-                </div>
-                {/* Route visualization */}
-                <svg className="absolute inset-0 h-full w-full" style={{ pointerEvents: "none" }}>
-                  <path
-                    d={`M 20% 80% Q ${currentPosition.x}% ${100 - currentPosition.y}%, 80% 10%`}
-                    fill="none"
-                    stroke="rgba(var(--primary), 0.5)"
-                    strokeWidth="2"
-                    strokeDasharray="5,5"
-                  />
-                </svg>
-              </div>
+            <div className="h-40 overflow-hidden rounded-md">
+              <GoogleMap
+                center={driverMarker?.position || { lat: 51.505, lng: -0.1 }}
+                markers={allMarkers}
+                movingMarker={driverMarker || undefined}
+                height="160px"
+                showControls={false}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3">

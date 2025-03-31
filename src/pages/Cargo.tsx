@@ -8,12 +8,42 @@ import CargoServiceTypes from "@/components/CargoServiceTypes";
 import CargoRequestForm from "@/components/CargoRequestForm";
 import LiveDriverTracking from "@/components/LiveDriverTracking";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import GoogleMap from "@/components/GoogleMap";
 
 const Cargo: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedPickupLocation, setSelectedPickupLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedDeliveryLocation, setSelectedDeliveryLocation] = useState<{ lat: number; lng: number } | null>(null);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  // Create markers array for the map
+  const markers = [
+    ...(selectedPickupLocation ? [{ 
+      position: selectedPickupLocation,
+      title: "Pickup Location"
+    }] : []),
+    ...(selectedDeliveryLocation ? [{ 
+      position: selectedDeliveryLocation,
+      title: "Delivery Location"
+    }] : [])
+  ];
+
+  // Handle map click to set locations
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (!selectedPickupLocation) {
+      setSelectedPickupLocation({ 
+        lat: e.latLng!.lat(), 
+        lng: e.latLng!.lng() 
+      });
+    } else if (!selectedDeliveryLocation) {
+      setSelectedDeliveryLocation({ 
+        lat: e.latLng!.lat(), 
+        lng: e.latLng!.lng() 
+      });
+    }
   };
 
   return (
@@ -36,6 +66,12 @@ const Cargo: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main content - 2 columns wide */}
                 <div className="lg:col-span-2 space-y-6">
+                  <GoogleMap 
+                    height="350px"
+                    markers={markers}
+                    onClick={handleMapClick}
+                    center={{ lat: 51.505, lng: -0.09 }}
+                  />
                   <CargoCalculator />
                   <CargoRequestForm />
                 </div>
