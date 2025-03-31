@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -37,16 +36,18 @@ const Cargo: React.FC = () => {
 
   // Handle map click to set locations
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (!selectedPickupLocation) {
-      setSelectedPickupLocation({ 
-        lat: e.latLng!.lat(), 
-        lng: e.latLng!.lng() 
-      });
-    } else if (!selectedDeliveryLocation) {
-      setSelectedDeliveryLocation({ 
-        lat: e.latLng!.lat(), 
-        lng: e.latLng!.lng() 
-      });
+    if (e.latLng) {
+      if (!selectedPickupLocation) {
+        setSelectedPickupLocation({ 
+          lat: e.latLng.lat(), 
+          lng: e.latLng.lng() 
+        });
+      } else if (!selectedDeliveryLocation) {
+        setSelectedDeliveryLocation({ 
+          lat: e.latLng.lat(), 
+          lng: e.latLng.lng() 
+        });
+      }
     }
   };
 

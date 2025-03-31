@@ -5,14 +5,6 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, Plus, Minus, Locate } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Define types for the Google Maps API
-declare global {
-  interface Window {
-    initMap: () => void;
-    google: typeof google;
-  }
-}
-
 // Define prop types for the GoogleMap component
 interface Marker {
   position: { lat: number; lng: number };
@@ -48,11 +40,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [movingMapMarker, setMovingMapMarker] = useState<google.maps.Marker | null>(null);
   const { toast } = useToast();
 
+  // Store API key securely
+  const apiKey = 'AIzaSyALuCNNPFkcBqo6mC2QAzT7PSJZs44RNHU';
+
   useEffect(() => {
     // Check if Google Maps API is already loaded
     if (!window.google) {
       // If not loaded, create script and load it
-      const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your Google Maps API key
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
       script.async = true;
