@@ -9,7 +9,8 @@ import {
   Settings, 
   Heart, 
   LogOut, 
-  X 
+  X,
+  ChevronLeft 
 } from "lucide-react";
 
 interface SidebarProps {
@@ -29,22 +30,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/30 z-40 md:hidden" 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
           onClick={toggleSidebar}
         />
       )}
       
+      {/* Sidebar */}
       <aside 
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r transform transition-transform duration-200 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } md:relative md:z-0`}
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-900 border-r shadow-lg transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:sticky md:translate-x-0 md:transition-[width] ${!isOpen && "md:w-16"}`}
       >
         <div className="flex flex-col h-full">
+          {/* Header with collapsing button */}
           <div className="flex items-center justify-between p-4 border-b">
-            <div className="flex items-center gap-2">
+            <div className={`flex items-center gap-2 ${!isOpen && "md:hidden"}`}>
               <Map className="h-6 w-6 text-primary" />
               <span className="text-lg font-bold">Go-Go</span>
             </div>
@@ -52,13 +55,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               variant="ghost" 
               size="icon" 
               onClick={toggleSidebar}
-              className="md:hidden"
+              className="md:flex"
+              title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
             >
-              <X className="h-4 w-4" />
+              {isOpen ? <ChevronLeft className="h-4 w-4" /> : <Map className="h-4 w-4" />}
             </Button>
           </div>
           
-          <nav className="flex-1 overflow-y-auto p-4">
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto p-2">
             <ul className="space-y-1">
               {menuItems.map((item) => (
                 <li key={item.label}>
@@ -69,19 +74,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         ? "bg-primary text-white"
                         : "hover:bg-accent"
                     }`}
+                    title={item.label}
                   >
                     <item.icon className="h-5 w-5" />
-                    {item.label}
+                    {isOpen && <span>{item.label}</span>}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
           
+          {/* Footer */}
           <div className="p-4 border-t">
-            <Button variant="outline" className="w-full flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className={`w-full flex items-center gap-2 ${!isOpen && "md:p-2 md:justify-center"}`}
+            >
               <LogOut className="h-4 w-4" />
-              Logout
+              {isOpen && "Logout"}
             </Button>
           </div>
         </div>

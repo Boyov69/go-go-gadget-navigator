@@ -4,29 +4,30 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { 
-  Map, 
   Navigation2, 
   MapPin, 
   Search, 
-  Heart, 
-  Share2,
   Car,
   Clock,
   Building,
-  Package
+  Package,
+  Map,
+  Train,
+  Bike
 } from "lucide-react";
 
 const QuickTools: React.FC = () => {
   const { toast } = useToast();
   
   const tools = [
-    { icon: Navigation2, label: "Navigate", color: "bg-blue-100", action: "Navigation started" },
-    { icon: Map, label: "Explore Map", color: "bg-teal-100", action: "Exploring map" },
-    { icon: MapPin, label: "Saved Places", color: "bg-blue-100", action: "Viewing saved places" },
-    { icon: Search, label: "Search", color: "bg-teal-100", action: "Search activated" },
-    { icon: Car, label: "Book Ride", color: "bg-blue-100", action: "Opening ride booking" },
-    { icon: Package, label: "Cargo Delivery", color: "bg-orange-100", isLink: true, to: "/cargo" },
-    { icon: Building, label: "For Providers", color: "bg-amber-100", isLink: true, to: "/suppliers" },
+    { icon: Navigation2, label: "Navigate", color: "bg-blue-100 text-blue-700", action: "Navigation started" },
+    { icon: Map, label: "Explore Map", color: "bg-green-100 text-green-700", action: "Exploring map" },
+    { icon: MapPin, label: "Saved Places", color: "bg-purple-100 text-purple-700", action: "Viewing saved places" },
+    { icon: Car, label: "Book Ride", color: "bg-amber-100 text-amber-700", action: "Opening ride booking" },
+    { icon: Train, label: "Train", color: "bg-red-100 text-red-700", action: "Checking train schedules" },
+    { icon: Bike, label: "Bike Rental", color: "bg-teal-100 text-teal-700", action: "Finding bike rentals" },
+    { icon: Package, label: "Cargo", color: "bg-orange-100 text-orange-700", isLink: true, to: "/cargo" },
+    { icon: Building, label: "Providers", color: "bg-sky-100 text-sky-700", isLink: true, to: "/suppliers" },
   ];
 
   const handleToolClick = (toolName: string, action: string) => {
@@ -38,29 +39,30 @@ const QuickTools: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Quick Tools</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    <div>
+      <h2 className="text-xl font-semibold mb-4">Quick Tools</h2>
+      
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
         {tools.map((tool, index) => (
           tool.isLink ? (
-            <Link to={tool.to || "/"} key={index}>
+            <Link to={tool.to || "/"} key={index} className="block">
               <Button
                 variant="outline"
-                className={`h-auto w-full flex-col gap-2 py-6 ${tool.color} hover:bg-accent border-2`}
+                className={`h-auto w-full flex-col gap-2 py-4 ${tool.color} hover:opacity-80 transition-all border-2`}
               >
                 <tool.icon className="h-6 w-6" />
-                <span>{tool.label}</span>
+                <span className="text-xs font-medium">{tool.label}</span>
               </Button>
             </Link>
           ) : (
             <Button
               key={index}
               variant="outline"
-              className={`h-auto flex-col gap-2 py-6 ${tool.color} hover:bg-accent border-2`}
+              className={`h-auto w-full flex-col gap-2 py-4 ${tool.color} hover:opacity-80 transition-all border-2`}
               onClick={() => handleToolClick(tool.label, tool.action)}
             >
               <tool.icon className="h-6 w-6" />
-              <span>{tool.label}</span>
+              <span className="text-xs font-medium">{tool.label}</span>
             </Button>
           )
         ))}
