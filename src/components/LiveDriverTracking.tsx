@@ -2,22 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
-import { MapPin, Navigation, Star, Phone, MessageSquare, Clock, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Navigation } from "lucide-react";
 import GoogleMap from "./GoogleMap";
+import DriverInfoCard, { DriverInfoProps } from "./tracking/DriverInfoCard";
+import TrackingStats from "./tracking/TrackingStats";
+import DriverActions from "./tracking/DriverActions";
+import LoadingState from "./tracking/LoadingState";
 
-interface DriverInfo {
-  id: string;
-  name: string;
-  photo: string;
-  rating: number;
-  vehicle: {
-    model: string;
-    color: string;
-    licensePlate: string;
-  };
+interface DriverDetails extends DriverInfoProps {
   eta: number; // minutes
   distance: number; // kilometers
   location: {
@@ -27,8 +19,7 @@ interface DriverInfo {
 }
 
 const LiveDriverTracking: React.FC = () => {
-  const { toast } = useToast();
-  const [driverInfo, setDriverInfo] = useState<DriverInfo | null>(null);
+  const [driverInfo, setDriverInfo] = useState<DriverDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [driverMarker, setDriverMarker] = useState<{ 
     position: { lat: number; lng: number };
@@ -114,44 +105,8 @@ const LiveDriverTracking: React.FC = () => {
     return () => clearInterval(interval);
   }, [isLoading, driverInfo]);
 
-  const handleCallDriver = () => {
-    toast({
-      title: "Calling driver",
-      description: "Connecting you with Alex Johnson",
-    });
-  };
-
-  const handleMessageDriver = () => {
-    toast({
-      title: "Message sent",
-      description: "Your message has been sent to the driver",
-    });
-  };
-
-  const handleShareLocation = () => {
-    toast({
-      title: "Location shared",
-      description: "Your live location is being shared with the driver",
-    });
-  };
-
   if (isLoading) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Navigation className="h-5 w-5" />
-            Finding Your Driver
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex justify-center items-center h-60">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-12 w-12 rounded-full border-4 border-t-primary border-r-primary border-b-primary/20 border-l-primary/20 animate-spin" />
-            <p className="text-muted-foreground">Connecting with nearby drivers...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState />;
   }
 
   const allMarkers = [startingMarker, destinationMarker].filter(Boolean);
@@ -173,29 +128,7 @@ const LiveDriverTracking: React.FC = () => {
       <CardContent className="space-y-4">
         {driverInfo && (
           <>
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12 border-2 border-primary">
-                  <img src={driverInfo.photo} alt={driverInfo.name} />
-                </Avatar>
-                <div>
-                  <h3 className="font-medium">{driverInfo.name}</h3>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-1" />
-                    {driverInfo.rating}
-                    <span className="mx-2">•</span>
-                    <Shield className="h-3 w-3 mr-1" />
-                    Verified
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-medium">{driverInfo.vehicle.model}</div>
-                <div className="text-sm text-muted-foreground">
-                  {driverInfo.vehicle.color} • {driverInfo.vehicle.licensePlate}
-                </div>
-              </div>
-            </div>
+            <DriverInfoCard driverInfo={driverInfo} />
 
             <div className="h-40 overflow-hidden rounded-md">
               <GoogleMap
@@ -207,49 +140,8 @@ const LiveDriverTracking: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="border rounded-md p-3 text-center">
-                <div className="text-sm text-muted-foreground">ETA</div>
-                <div className="flex items-center justify-center gap-1 font-medium">
-                  <Clock className="h-4 w-4" />
-                  {Math.ceil(driverInfo.eta)} mins
-                </div>
-              </div>
-              <div className="border rounded-md p-3 text-center">
-                <div className="text-sm text-muted-foreground">Distance</div>
-                <div className="flex items-center justify-center gap-1 font-medium">
-                  <Navigation className="h-4 w-4" />
-                  {driverInfo.distance.toFixed(1)} km
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                className="flex-1 gap-1"
-                onClick={handleCallDriver}
-              >
-                <Phone className="h-4 w-4" />
-                Call
-              </Button>
-              <Button
-                variant="secondary"
-                className="flex-1 gap-1"
-                onClick={handleMessageDriver}
-              >
-                <MessageSquare className="h-4 w-4" />
-                Message
-              </Button>
-              <Button
-                variant="outline"
-                className="gap-1"
-                onClick={handleShareLocation}
-              >
-                <MapPin className="h-4 w-4" />
-                Share Location
-              </Button>
-            </div>
+            <TrackingStats eta={driverInfo.eta} distance={driverInfo.distance} />
+            <DriverActions />
           </>
         )}
       </CardContent>

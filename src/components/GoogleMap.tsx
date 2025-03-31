@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, Plus, Minus, Locate } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Define types for the Google Maps API
+declare global {
+  interface Window {
+    initMap: () => void;
+    google: typeof google;
+  }
+}
+
 // Define prop types for the GoogleMap component
 interface Marker {
   position: { lat: number; lng: number };
@@ -22,13 +30,6 @@ interface GoogleMapProps {
   showControls?: boolean;
   movingMarker?: Marker;
   onClick?: (e: google.maps.MapMouseEvent) => void;
-}
-
-declare global {
-  interface Window {
-    initMap: () => void;
-    google: any;
-  }
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({
@@ -77,9 +78,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // Initialize Google Map
   const initializeMap = () => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !window.google) return;
     
-    const mapOptions: google.maps.MapOptions = {
+    const mapOptions = {
       center,
       zoom,
       disableDefaultUI: !showControls,
@@ -94,7 +95,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       ]
     };
     
-    const newMap = new google.maps.Map(mapRef.current, mapOptions);
+    const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
     setMap(newMap);
     
     // Add event listener if onClick is provided
@@ -105,7 +106,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   
   // Add markers when map or markers change
   useEffect(() => {
-    if (!map) return;
+    if (!map || !window.google) return;
     
     // Clear previous markers
     mapMarkers.forEach(marker => marker.setMap(null));
@@ -113,7 +114,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     
     // Add new markers
     const newMapMarkers = markers.map(marker => {
-      return new google.maps.Marker({
+      return new window.google.maps.Marker({
         position: marker.position,
         map,
         title: marker.title,
@@ -127,17 +128,17 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   
   // Handle moving marker updates
   useEffect(() => {
-    if (!map || !movingMarker) return;
+    if (!map || !movingMarker || !window.google) return;
     
     if (movingMapMarker) {
       movingMapMarker.setPosition(movingMarker.position);
     } else {
-      const newMarker = new google.maps.Marker({
+      const newMarker = new window.google.maps.Marker({
         position: movingMarker.position,
         map,
         title: movingMarker.title,
         icon: movingMarker.icon,
-        animation: google.maps.Animation.DROP
+        animation: window.google.maps.Animation.DROP
       });
       setMovingMapMarker(newMarker);
     }
@@ -164,16 +165,16 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             lng: position.coords.longitude
           };
           
-          if (map) {
+          if (map && window.google) {
             map.setCenter(userLocation);
             map.setZoom(15);
             
             // Add a marker at the user's location
-            new google.maps.Marker({
+            new window.google.maps.Marker({
               position: userLocation,
               map,
               title: "Your Location",
-              animation: google.maps.Animation.DROP
+              animation: window.google.maps.Animation.DROP
             });
           }
         },

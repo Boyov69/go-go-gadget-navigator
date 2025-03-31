@@ -2,13 +2,17 @@
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import { useToast } from "@/hooks/use-toast";
 import CargoCalculator from "@/components/CargoCalculator";
 import CargoServiceTypes from "@/components/CargoServiceTypes";
 import CargoRequestForm from "@/components/CargoRequestForm";
 import LiveDriverTracking from "@/components/LiveDriverTracking";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GoogleMap from "@/components/GoogleMap";
+
+interface Marker {
+  position: { lat: number; lng: number };
+  title: string;
+}
 
 const Cargo: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -20,7 +24,7 @@ const Cargo: React.FC = () => {
   };
 
   // Create markers array for the map
-  const markers = [
+  const markers: Marker[] = [
     ...(selectedPickupLocation ? [{ 
       position: selectedPickupLocation,
       title: "Pickup Location"
