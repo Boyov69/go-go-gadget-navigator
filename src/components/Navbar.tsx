@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Map, Menu, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -44,7 +45,9 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
           <Button variant="ghost" size="sm" className="hidden md:flex">
             Help
           </Button>
-          <Button size="sm">Plan a Trip</Button>
+          <Button size="sm" asChild>
+            <Link to="/suppliers">Providers</Link>
+          </Button>
         </div>
       </div>
     </header>

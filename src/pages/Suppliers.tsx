@@ -4,7 +4,9 @@ import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import SupplierRegistration from "@/components/SupplierRegistration";
 import SupplierDashboard from "@/components/SupplierDashboard";
+import ProviderSearch from "@/components/ProviderSearch";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Suppliers: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -24,11 +26,22 @@ const Suppliers: React.FC = () => {
         <main className="container px-4 py-6 md:py-8 mx-auto animate-fade-in">
           <h1 className="text-2xl font-bold mb-6">Transportation Service Providers</h1>
           
-          {isRegistered ? (
-            <SupplierDashboard />
-          ) : (
-            <SupplierRegistration onRegistered={() => setIsRegistered(true)} />
-          )}
+          <Tabs defaultValue="search" className="w-full mb-6">
+            <TabsList>
+              <TabsTrigger value="search">Find Providers</TabsTrigger>
+              <TabsTrigger value="register">Register as Provider</TabsTrigger>
+            </TabsList>
+            <TabsContent value="search" className="mt-6">
+              <ProviderSearch />
+            </TabsContent>
+            <TabsContent value="register" className="mt-6">
+              {isRegistered ? (
+                <SupplierDashboard />
+              ) : (
+                <SupplierRegistration onRegistered={() => setIsRegistered(true)} />
+              )}
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </div>

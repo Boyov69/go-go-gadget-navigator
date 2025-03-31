@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { 
   Home, 
   Map, 
@@ -9,7 +10,7 @@ import {
   Settings, 
   Heart, 
   LogOut, 
-  X,
+  Building,
   ChevronLeft 
 } from "lucide-react";
 
@@ -20,12 +21,13 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const menuItems = [
-    { icon: Home, label: "Home", active: true },
-    { icon: Map, label: "Explore" },
-    { icon: Compass, label: "Navigate" },
-    { icon: BookMarked, label: "Saved Trips" },
-    { icon: Heart, label: "Favorites" },
-    { icon: Settings, label: "Settings" },
+    { icon: Home, label: "Home", path: "/", active: window.location.pathname === "/" },
+    { icon: Map, label: "Explore", path: "/" },
+    { icon: Compass, label: "Navigate", path: "/" },
+    { icon: BookMarked, label: "Saved Trips", path: "/" },
+    { icon: Building, label: "Providers", path: "/suppliers", active: window.location.pathname === "/suppliers" },
+    { icon: Heart, label: "Favorites", path: "/" },
+    { icon: Settings, label: "Settings", path: "/" },
   ];
 
   return (
@@ -67,8 +69,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <ul className="space-y-1">
               {menuItems.map((item) => (
                 <li key={item.label}>
-                  <a
-                    href="#"
+                  <Link
+                    to={item.path}
                     className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                       item.active
                         ? "bg-primary text-white"
@@ -78,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   >
                     <item.icon className="h-5 w-5" />
                     {isOpen && <span>{item.label}</span>}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
