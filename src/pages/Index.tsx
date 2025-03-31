@@ -10,15 +10,20 @@ import RideHistory from "@/components/RideHistory";
 import EmergencyButton from "@/components/EmergencyButton";
 import GoogleMap from "@/components/GoogleMap";
 import LocalTransportInfo from "@/components/LocalTransportInfo";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import GlobalCoverage from "@/components/GlobalCoverage";
 import LanguageSelector from "@/components/LanguageSelector";
 import DriverRating from "@/components/driver/DriverRating";
 import FloatingNavigation from "@/components/FloatingNavigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/services/auth";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [language, setLanguage] = useState("en");
+  const { login, logout, user } = useAuth();
   
   // Sample locations for the map - Belgian cities
   const popularLocations = [
@@ -63,6 +68,20 @@ const Index: React.FC = () => {
     // In a real app, you would update translations here
   };
 
+  // Test login as super admin
+  const loginAsSuperAdmin = async () => {
+    // In a real app, you wouldn't hardcode credentials
+    // This is just for demo purposes
+    const success = await login("superadmin@example.com", "password123");
+    
+    if (success) {
+      toast({
+        title: "Logged in as Super Admin",
+        description: "You now have access to the Super Admin Dashboard",
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
@@ -83,6 +102,28 @@ const Index: React.FC = () => {
           <div className="mb-6">
             <QuickTools />
           </div>
+
+          {/* Test login section - Only shown when not logged in */}
+          {!user && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Test Login</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-3 text-sm text-muted-foreground">
+                  For demonstration purposes only. Click below to login as a Super Admin user.
+                </p>
+                <Button onClick={loginAsSuperAdmin} className="mr-2">
+                  Login as Super Admin
+                </Button>
+                {user && (
+                  <Button variant="outline" onClick={logout}>
+                    Logout
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left column */}

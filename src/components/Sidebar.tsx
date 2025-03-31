@@ -14,7 +14,7 @@ import {
   Package,
   ChevronLeft,
   LayoutDashboard,
-  Crown  // New import for super admin icon
+  Crown
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -69,12 +69,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   }, [user]);
 
   const handleLogout = () => {
+    // Call the logout function from auth context
     logout();
+    
+    // Add toast notification
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account",
       duration: 3000,
     });
+    
+    // Navigate to home page
     navigate("/");
   };
 
@@ -140,10 +145,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               variant="outline" 
               className={`w-full flex items-center gap-2 ${!isOpen && "md:p-2 md:justify-center"}`}
               onClick={handleLogout}
-              title="Uitloggen"
+              title="Logout"
             >
               <LogOut className="h-4 w-4" />
-              {isOpen && "Logout"}
+              {isOpen && <span>Logout</span>}
             </Button>
           </div>
         </div>
