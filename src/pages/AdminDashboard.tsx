@@ -120,16 +120,18 @@ const AdminDashboard: React.FC = () => {
     });
   };
 
-  // Filter users based on search query
+  // Fix: Add null checks before filtering
   const filteredUsers = users?.filter(user => 
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
-  // Filter providers based on search query
+  // Fix: Add null checks before filtering
   const filteredProviders = providers?.filter(provider => 
     provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    provider.services.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
+    (provider.services && provider.services.some(s => 
+      s.toLowerCase().includes(searchQuery.toLowerCase())
+    ))
   ) || [];
 
   return (
@@ -175,7 +177,7 @@ const AdminDashboard: React.FC = () => {
                     <p>Error loading dashboard statistics. Please try again.</p>
                   </CardContent>
                 </Card>
-              ) : (
+              ) : stats ? (
                 <>
                   <Card>
                     <CardHeader className="pb-2">
@@ -239,7 +241,7 @@ const AdminDashboard: React.FC = () => {
                     </CardContent>
                   </Card>
                 </>
-              )}
+              ) : null}
             </div>
             
             <div className="relative">
@@ -388,7 +390,8 @@ const AdminDashboard: React.FC = () => {
                                 <td className="py-3 px-4 font-medium">{provider.name}</td>
                                 <td className="py-3 px-4">
                                   <div className="flex flex-wrap gap-1">
-                                    {provider.services.map((service, i) => (
+                                    {/* Fix: Add null check for services array */}
+                                    {provider.services && provider.services.map((service, i) => (
                                       <span
                                         key={i}
                                         className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary"
