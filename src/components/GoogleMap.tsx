@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { Card } from "@/components/ui/card";
-import { useMapInitializer } from './map/useMapInitializer';
+import { useMapInitializer, MapStyleName } from './map/useMapInitializer';
 import { useMapMarkers, useMovingMarker, MarkerProps } from './map/MapMarker';
 import { MapControls } from './map/MapControls';
 
@@ -14,6 +14,7 @@ interface GoogleMapProps {
   height?: string;
   showControls?: boolean;
   movingMarker?: MarkerProps;
+  mapStyle?: MapStyleName;
   onClick?: (e: google.maps.MapMouseEvent) => void;
 }
 
@@ -25,6 +26,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   height = "400px",
   showControls = true,
   movingMarker,
+  mapStyle = "default",
   onClick
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   // Initialize map
   const { map } = useMapInitializer(
     mapRef,
-    { center, zoom, showControls },
+    { center, zoom, showControls, mapStyle },
     onClick
   );
   

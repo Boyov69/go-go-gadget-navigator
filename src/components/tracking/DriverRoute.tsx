@@ -41,6 +41,7 @@ const DriverRoute: React.FC<DriverRouteProps> = ({
         movingMarker={driverMarker}
         height="160px"
         showControls={false}
+        mapStyle="silver"
       />
     </Card>
   );

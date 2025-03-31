@@ -24,6 +24,7 @@ const MapSection: React.FC = () => {
           markers={markers}
           height="400px"
           showControls={true}
+          mapStyle="retro"
         />
       </CardContent>
     </Card>
