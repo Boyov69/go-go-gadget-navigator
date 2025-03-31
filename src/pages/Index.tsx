@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import GlobalCoverage from "@/components/GlobalCoverage";
 import LanguageSelector from "@/components/LanguageSelector";
 import DriverRating from "@/components/driver/DriverRating";
+import FloatingNavigation from "@/components/FloatingNavigation";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,7 +75,10 @@ const Index: React.FC = () => {
           />
         </Navbar>
         
-        <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8">
+        {/* Add FloatingNavigation component */}
+        <FloatingNavigation />
+        
+        <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 pb-20 md:pb-6">
           {/* Quick Tools at the top - more visible */}
           <div className="mb-6">
             <QuickTools />
