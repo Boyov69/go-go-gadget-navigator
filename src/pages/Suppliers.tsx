@@ -5,7 +5,6 @@ import Sidebar from "@/components/Sidebar";
 import SupplierRegistration from "@/components/SupplierRegistration";
 import SupplierDashboard from "@/components/SupplierDashboard";
 import ProviderSearch from "@/components/ProviderSearch";
-import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Suppliers: React.FC = () => {
