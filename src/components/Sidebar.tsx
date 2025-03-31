@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   Home, 
   Map, 
@@ -12,9 +12,12 @@ import {
   LogOut, 
   Building,
   Package,
-  ChevronLeft 
+  ChevronLeft,
+  LayoutDashboard
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { UserRole } from "@/services/auth";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,9 +26,11 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
-  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
-  const menuItems = [
+  // Base menu items available for all users
+  const baseMenuItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Map, label: "Explore", path: "/explore" },
     { icon: Compass, label: "Navigate", path: "/navigate" },
@@ -35,9 +40,41 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { icon: Heart, label: "Favorites", path: "/favorites" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
+  
+  // Admin menu items that only appear for admin users
+  const adminMenuItems = [
+    { icon: LayoutDashboard, label: "Admin Dashboard", path: "/admin/dashboard" },
+  ];
+  
+  // Super admin menu items
+  const superAdminMenuItems = [
+    { icon: LayoutDashboard, label: "Super Admin", path: "/super-admin/dashboard" },
+  ];
+  
+  // Combine menu items based on user role
+  const menuItems = React.useMemo(() => {
+    let items = [...baseMenuItems];
+    
+    if (user) {
+      if (user.role === UserRole.ADMIN) {
+        items = [...items, ...adminMenuItems];
+      }
+      if (user.role === UserRole.SUPER_ADMIN) {
+        items = [...items, ...adminMenuItems, ...superAdminMenuItems];
+      }
+    }
+    
+    return items;
+  }, [user]);
 
   const handleLogout = () => {
     logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account",
+      duration: 3000,
+    });
+    navigate("/");
   };
 
   return (
