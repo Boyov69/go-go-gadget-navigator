@@ -7,6 +7,10 @@ import PopularDestinations from "@/components/PopularDestinations";
 import RecentTrips from "@/components/RecentTrips";
 import QuickTools from "@/components/QuickTools";
 import PlanTripCard from "@/components/PlanTripCard";
+import RideBooking from "@/components/RideBooking";
+import SavedAddresses from "@/components/SavedAddresses";
+import RideHistory from "@/components/RideHistory";
+import EmergencyButton from "@/components/EmergencyButton";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -28,16 +32,21 @@ const Index: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               <MapSection />
               <QuickTools />
+              <RideBooking />
               <PopularDestinations />
+              <SavedAddresses />
             </div>
             
             {/* Side panel - 1 column wide */}
             <div className="space-y-6">
               <PlanTripCard />
+              <RideHistory />
               <RecentTrips />
             </div>
           </div>
         </main>
+        
+        <EmergencyButton />
       </div>
     </div>
   );

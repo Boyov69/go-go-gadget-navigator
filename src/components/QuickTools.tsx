@@ -8,7 +8,9 @@ import {
   MapPin, 
   Search, 
   Heart, 
-  Share2 
+  Share2,
+  Car,
+  Clock
 } from "lucide-react";
 
 const QuickTools: React.FC = () => {
@@ -19,6 +21,8 @@ const QuickTools: React.FC = () => {
     { icon: Map, label: "Explore Map", color: "bg-teal-100", action: "Exploring map" },
     { icon: MapPin, label: "Saved Places", color: "bg-blue-100", action: "Viewing saved places" },
     { icon: Search, label: "Search", color: "bg-teal-100", action: "Search activated" },
+    { icon: Car, label: "Book Ride", color: "bg-blue-100", action: "Opening ride booking" },
+    { icon: Clock, label: "Schedule", color: "bg-teal-100", action: "Opening ride scheduler" },
   ];
 
   const handleToolClick = (toolName: string, action: string) => {
@@ -32,7 +36,7 @@ const QuickTools: React.FC = () => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Quick Tools</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {tools.map((tool, index) => (
           <Button
             key={index}
