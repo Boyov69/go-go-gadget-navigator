@@ -1,26 +1,19 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Plus, Minus, Locate } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useMapInitializer } from './map/useMapInitializer';
+import { useMapMarkers, useMovingMarker, MarkerProps } from './map/MapMarker';
+import { MapControls } from './map/MapControls';
 
 // Define prop types for the GoogleMap component
-interface Marker {
-  position: { lat: number; lng: number };
-  icon?: string;
-  title?: string;
-  animation?: google.maps.Animation;
-}
-
 interface GoogleMapProps {
   center?: { lat: number; lng: number };
   zoom?: number;
-  markers?: Marker[];
+  markers?: MarkerProps[];
   className?: string;
   height?: string;
   showControls?: boolean;
-  movingMarker?: Marker;
+  movingMarker?: MarkerProps;
   onClick?: (e: google.maps.MapMouseEvent) => void;
 }
 
@@ -35,157 +28,19 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   onClick
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapMarkers, setMapMarkers] = useState<google.maps.Marker[]>([]);
-  const [movingMapMarker, setMovingMapMarker] = useState<google.maps.Marker | null>(null);
-  const { toast } = useToast();
 
-  // Store API key securely
-  const apiKey = 'AIzaSyALuCNNPFkcBqo6mC2QAzT7PSJZs44RNHU';
-
-  useEffect(() => {
-    // Check if Google Maps API is already loaded
-    if (!window.google) {
-      // If not loaded, create script and load it
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      
-      window.initMap = () => {
-        if (mapRef.current) {
-          initializeMap();
-        }
-      };
-      
-      document.head.appendChild(script);
-      
-      return () => {
-        // Clean up the global callback
-        delete window.initMap;
-      };
-    } else if (mapRef.current && !map) {
-      // If API is already loaded, initialize the map
-      initializeMap();
-    }
-  }, [mapRef.current]);
-
-  // Initialize Google Map
-  const initializeMap = () => {
-    if (!mapRef.current || !window.google) return;
-    
-    const mapOptions = {
-      center,
-      zoom,
-      disableDefaultUI: !showControls,
-      mapTypeControl: false,
-      fullscreenControl: false,
-      styles: [
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }]
-        }
-      ]
-    };
-    
-    const newMap = new window.google.maps.Map(mapRef.current, mapOptions);
-    setMap(newMap);
-    
-    // Add event listener if onClick is provided
-    if (onClick) {
-      newMap.addListener("click", onClick);
-    }
-  };
+  // Initialize map
+  const { map } = useMapInitializer(
+    mapRef,
+    { center, zoom, showControls },
+    onClick
+  );
   
-  // Add markers when map or markers change
-  useEffect(() => {
-    if (!map || !window.google) return;
-    
-    // Clear previous markers
-    mapMarkers.forEach(marker => marker.setMap(null));
-    setMapMarkers([]);
-    
-    // Add new markers
-    const newMapMarkers = markers.map(marker => {
-      return new window.google.maps.Marker({
-        position: marker.position,
-        map,
-        title: marker.title,
-        icon: marker.icon,
-        animation: marker.animation
-      });
-    });
-    
-    setMapMarkers(newMapMarkers);
-  }, [map, markers]);
+  // Set up map markers
+  useMapMarkers(map, markers);
   
-  // Handle moving marker updates
-  useEffect(() => {
-    if (!map || !movingMarker || !window.google) return;
-    
-    if (movingMapMarker) {
-      movingMapMarker.setPosition(movingMarker.position);
-    } else {
-      const newMarker = new window.google.maps.Marker({
-        position: movingMarker.position,
-        map,
-        title: movingMarker.title,
-        icon: movingMarker.icon,
-        animation: window.google.maps.Animation.DROP
-      });
-      setMovingMapMarker(newMarker);
-    }
-  }, [map, movingMarker]);
-
-  const handleZoomIn = () => {
-    if (map) {
-      map.setZoom(map.getZoom()! + 1);
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (map) {
-      map.setZoom(map.getZoom()! - 1);
-    }
-  };
-
-  const handleMyLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          
-          if (map && window.google) {
-            map.setCenter(userLocation);
-            map.setZoom(15);
-            
-            // Add a marker at the user's location
-            new window.google.maps.Marker({
-              position: userLocation,
-              map,
-              title: "Your Location",
-              animation: window.google.maps.Animation.DROP
-            });
-          }
-        },
-        () => {
-          toast({
-            title: "Location Error",
-            description: "Unable to access your location."
-          });
-        }
-      );
-    } else {
-      toast({
-        title: "Location Error",
-        description: "Geolocation is not supported by your browser."
-      });
-    }
-  };
+  // Set up moving marker if provided
+  useMovingMarker(map, movingMarker);
 
   return (
     <Card className={`relative overflow-hidden rounded-lg ${className}`}>
@@ -195,26 +50,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         className="bg-blue-50"
       />
       
-      {showControls && (
-        <>
-          <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-            <Button variant="outline" size="icon" className="bg-white shadow-sm" onClick={handleZoomIn}>
-              <Plus className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="bg-white shadow-sm" onClick={handleZoomOut}>
-              <Minus className="h-4 w-4" />
-            </Button>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="absolute bottom-4 right-4 z-10 shadow-sm flex gap-2"
-            onClick={handleMyLocation}
-          >
-            <Locate className="h-4 w-4" /> My Location
-          </Button>
-        </>
-      )}
+      <MapControls map={map} showControls={showControls} />
     </Card>
   );
 };
