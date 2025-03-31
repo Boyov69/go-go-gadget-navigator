@@ -18,11 +18,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/services/auth";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [language, setLanguage] = useState("en");
   const { login, logout, user } = useAuth();
+  const { t } = useLanguage();
   
   // Sample locations for the map - Belgian cities
   const popularLocations = [
@@ -60,11 +61,6 @@ const Index: React.FC = () => {
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
-  };
-
-  const handleLanguageChange = (langCode: string) => {
-    setLanguage(langCode);
-    // In a real app, you would update translations here
   };
 
   // Test login functions for different user roles
@@ -107,10 +103,7 @@ const Index: React.FC = () => {
       
       <div className="flex-1 flex flex-col">
         <Navbar toggleSidebar={toggleSidebar}>
-          <LanguageSelector 
-            currentLanguage={language}
-            onLanguageChange={handleLanguageChange}
-          />
+          <LanguageSelector />
         </Navbar>
         
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 pb-20 md:pb-6">
@@ -123,7 +116,7 @@ const Index: React.FC = () => {
           {!user && (
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle>Test Login</CardTitle>
+                <CardTitle>{t("auth.login")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-3 text-sm text-muted-foreground">
@@ -131,13 +124,13 @@ const Index: React.FC = () => {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button onClick={loginAsSuperAdmin} className="bg-purple-700 hover:bg-purple-800">
-                    Login as Super Admin
+                    {t("auth.loginAsSuperAdmin")}
                   </Button>
                   <Button onClick={loginAsAdmin} className="bg-blue-600 hover:bg-blue-700">
-                    Login as Admin
+                    {t("auth.loginAsAdmin")}
                   </Button>
                   <Button onClick={loginAsUser} variant="outline">
-                    Login as Regular User
+                    {t("auth.loginAsUser")}
                   </Button>
                 </div>
               </CardContent>
@@ -150,7 +143,7 @@ const Index: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-full bg-green-500"></span>
-                  Logged in as {user.name}
+                  {t("auth.loggedInAs")} {user.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -160,7 +153,7 @@ const Index: React.FC = () => {
                     <p className="text-sm text-muted-foreground">Email: {user.email}</p>
                   </div>
                   <Button variant="outline" onClick={logout}>
-                    Logout
+                    {t("nav.logout")}
                   </Button>
                 </div>
               </CardContent>
@@ -179,7 +172,7 @@ const Index: React.FC = () => {
             <div className="lg:col-span-6 space-y-6">
               <Card className="shadow-sm">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-xl">Explore Belgium</CardTitle>
+                  <CardTitle className="text-xl">{t("home.exploreBelgium")}</CardTitle>
                 </CardHeader>
                 <GoogleMap 
                   markers={popularLocations}
@@ -214,3 +207,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+

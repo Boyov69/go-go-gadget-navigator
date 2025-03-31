@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, X, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const EmergencyButton: React.FC = () => {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
+  const { t } = useLanguage();
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -14,8 +16,8 @@ const EmergencyButton: React.FC = () => {
 
   const handleEmergencyCall = () => {
     toast({
-      title: "Emergency Call",
-      description: "Connecting to emergency services...",
+      title: t("emergency.emergencyCall"),
+      description: t("emergency.connecting"),
       variant: "destructive",
       duration: 5000,
     });
@@ -23,8 +25,8 @@ const EmergencyButton: React.FC = () => {
 
   const handleSupportCall = () => {
     toast({
-      title: "Support Call",
-      description: "Connecting to customer support...",
+      title: t("emergency.contactSupport"),
+      description: t("emergency.supportConnecting"),
       duration: 3000,
     });
   };
@@ -43,7 +45,7 @@ const EmergencyButton: React.FC = () => {
   return (
     <div className="fixed bottom-6 right-6 bg-card shadow-lg rounded-lg p-4 border animate-in fade-in slide-in-from-bottom-5 z-50">
       <div className="flex justify-between items-center mb-3">
-        <h4 className="font-semibold">Emergency Options</h4>
+        <h4 className="font-semibold">{t("emergency.title")}</h4>
         <Button
           variant="ghost"
           size="sm"
@@ -60,7 +62,7 @@ const EmergencyButton: React.FC = () => {
           onClick={handleEmergencyCall}
         >
           <AlertCircle className="h-4 w-4" />
-          Emergency Call
+          {t("emergency.emergencyCall")}
         </Button>
         <Button 
           variant="outline" 
@@ -68,7 +70,7 @@ const EmergencyButton: React.FC = () => {
           onClick={handleSupportCall}
         >
           <Phone className="h-4 w-4" />
-          Contact Support
+          {t("emergency.contactSupport")}
         </Button>
       </div>
     </div>

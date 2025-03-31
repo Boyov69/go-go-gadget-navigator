@@ -8,22 +8,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage, SupportedLanguage } from "@/contexts/LanguageContext";
 
 interface Language {
-  code: string;
+  code: SupportedLanguage;
   name: string;
   flag: string;
 }
 
-interface LanguageSelectorProps {
-  currentLanguage: string;
-  onLanguageChange: (languageCode: string) => void;
-}
+const LanguageSelector: React.FC = () => {
+  const { language, setLanguage } = useLanguage();
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  currentLanguage,
-  onLanguageChange,
-}) => {
   const languages: Language[] = [
     { code: "en", name: "English", flag: "🇬🇧" },
     { code: "fr", name: "Français", flag: "🇫🇷" },
@@ -33,7 +28,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     { code: "it", name: "Italiano", flag: "🇮🇹" },
   ];
 
-  const current = languages.find(lang => lang.code === currentLanguage) || languages[0];
+  const current = languages.find(lang => lang.code === language) || languages[0];
 
   return (
     <DropdownMenu>
@@ -46,16 +41,16 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {languages.map((language) => (
+        {languages.map((lang) => (
           <DropdownMenuItem
-            key={language.code}
-            onClick={() => onLanguageChange(language.code)}
+            key={lang.code}
+            onClick={() => setLanguage(lang.code)}
             className="flex items-center justify-between"
           >
             <span>
-              {language.flag} {language.name}
+              {lang.flag} {lang.name}
             </span>
-            {currentLanguage === language.code && (
+            {language === lang.code && (
               <Check className="h-4 w-4 ml-2" />
             )}
           </DropdownMenuItem>

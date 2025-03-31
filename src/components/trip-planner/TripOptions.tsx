@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Plus } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TripOptionsProps {
   showMultiStops: boolean;
@@ -15,6 +16,8 @@ const TripOptions: React.FC<TripOptionsProps> = ({
   onToggleMultiStops,
   onTogglePromoCode
 }) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex justify-between text-xs">
       <button 
@@ -23,10 +26,10 @@ const TripOptions: React.FC<TripOptionsProps> = ({
       >
         {!showMultiStops ? (
           <>
-            <Plus className="h-3.5 w-3.5" /> Add Multiple Stops
+            <Plus className="h-3.5 w-3.5" /> {t("trip.addStop")}
           </>
         ) : (
-          <>Remove Multiple Stops</>
+          <>{t("trip.removeStops")}</>
         )}
       </button>
       <button 
@@ -35,10 +38,10 @@ const TripOptions: React.FC<TripOptionsProps> = ({
       >
         {!showPromoCode ? (
           <>
-            <Plus className="h-3.5 w-3.5" /> Add Promo Code
+            <Plus className="h-3.5 w-3.5" /> {t("trip.addPromo")}
           </>
         ) : (
-          <>Remove Promo Code</>
+          <>{t("trip.removePromo")}</>
         )}
       </button>
     </div>

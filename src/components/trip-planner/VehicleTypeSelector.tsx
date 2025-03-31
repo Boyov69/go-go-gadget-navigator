@@ -1,14 +1,7 @@
 
 import React from "react";
 import { Car, Bus, Plane, Briefcase } from "lucide-react";
-
-interface VehicleType {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  description: string;
-  priceEstimate: string;
-}
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface VehicleTypeSelectorProps {
   selectedVehicleType: string;
@@ -19,33 +12,35 @@ const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
   selectedVehicleType,
   onVehicleTypeChange,
 }) => {
-  const vehicleTypes: VehicleType[] = [
+  const { t } = useLanguage();
+
+  const vehicleTypes = [
     {
       id: "economy",
-      name: "Economy",
+      name: t("trip.economy"),
       icon: <Car className="h-5 w-5" />,
-      description: "Affordable rides for everyday travel",
+      description: t("trip.affordableRides"),
       priceEstimate: "From €8.50",
     },
     {
       id: "comfort",
-      name: "Comfort",
+      name: t("trip.comfort"),
       icon: <Car className="h-5 w-5" />,
-      description: "Comfortable vehicles with extra amenities",
+      description: t("trip.comfortableVehicles"),
       priceEstimate: "From €12.75",
     },
     {
       id: "business",
-      name: "Business",
+      name: t("trip.business"),
       icon: <Briefcase className="h-5 w-5" />,
-      description: "Premium vehicles for business travel",
+      description: t("trip.premiumVehicles"),
       priceEstimate: "From €25.00",
     },
     {
       id: "shuttle",
-      name: "Shuttle",
+      name: t("trip.shuttle"),
       icon: <Bus className="h-5 w-5" />,
-      description: "Vans and minibuses for groups",
+      description: t("trip.groupVehicles"),
       priceEstimate: "From €35.00",
     },
   ];

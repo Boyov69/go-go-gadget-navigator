@@ -9,6 +9,7 @@ import TripFeatures from "./TripFeatures";
 import TripOptions from "./TripOptions";
 import TripActions from "./TripActions";
 import VehicleTypeSelector from "./VehicleTypeSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TripFormContentProps {
   from: string;
@@ -53,20 +54,22 @@ const TripFormContent: React.FC<TripFormContentProps> = ({
   handleFindRoute,
   handleComparePrice
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-3">
       {/* Origin Input */}
       <StopInput
         value={from}
         onChange={setFrom}
-        placeholder="From: Current Location"
+        placeholder={t("trip.from")}
       />
       
       {/* Destination Input */}
       <StopInput
         value={to}
         onChange={setTo}
-        placeholder="To: Destination"
+        placeholder={t("trip.to")}
       />
 
       {/* Multiple Stops Section */}
@@ -98,7 +101,7 @@ const TripFormContent: React.FC<TripFormContentProps> = ({
         <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input 
           type="text" 
-          placeholder="Departure: Now" 
+          placeholder={t("trip.departureNow")} 
           className="pl-8"
           onClick={handleScheduleRide}
         />
