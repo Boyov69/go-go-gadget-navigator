@@ -11,9 +11,13 @@ import EmergencyButton from "@/components/EmergencyButton";
 import GoogleMap from "@/components/GoogleMap";
 import LocalTransportInfo from "@/components/LocalTransportInfo";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import GlobalCoverage from "@/components/GlobalCoverage";
+import LanguageSelector from "@/components/LanguageSelector";
+import DriverRating from "@/components/driver/DriverRating";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [language, setLanguage] = useState("en");
   
   // Sample locations for the map - Belgian cities
   const popularLocations = [
@@ -24,8 +28,38 @@ const Index: React.FC = () => {
     { position: { lat: 51.3097, lng: 3.2340 }, title: "Bruges" },
   ];
   
+  // Sample driver reviews
+  const driverReviews = [
+    {
+      id: "rev1",
+      userName: "Jane Cooper",
+      rating: 5,
+      comment: "Really professional driver, car was clean and trip was smooth.",
+      date: "Oct 10, 2023"
+    },
+    {
+      id: "rev2",
+      userName: "Alex Morgan",
+      rating: 4,
+      comment: "Good service, arrived on time. Would use again.",
+      date: "Sep 5, 2023"
+    },
+    {
+      id: "rev3",
+      userName: "Sam Wilson",
+      rating: 5,
+      comment: "Outstanding service! The driver was very helpful with my luggage.",
+      date: "Aug 22, 2023"
+    }
+  ];
+  
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleLanguageChange = (langCode: string) => {
+    setLanguage(langCode);
+    // In a real app, you would update translations here
   };
 
   return (
@@ -33,7 +67,12 @@ const Index: React.FC = () => {
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       
       <div className="flex-1 flex flex-col">
-        <Navbar toggleSidebar={toggleSidebar} />
+        <Navbar toggleSidebar={toggleSidebar}>
+          <LanguageSelector 
+            currentLanguage={language}
+            onLanguageChange={handleLanguageChange}
+          />
+        </Navbar>
         
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8">
           {/* Quick Tools at the top - more visible */}
@@ -46,6 +85,7 @@ const Index: React.FC = () => {
             <div className="lg:col-span-3 space-y-6">
               <SavedAddresses />
               <RideHistory />
+              <GlobalCoverage />
             </div>
             
             {/* Center column with map - largest component */}
@@ -63,6 +103,13 @@ const Index: React.FC = () => {
               </Card>
               
               <LocalTransportInfo />
+              
+              <DriverRating
+                driverName="Michael Johnson"
+                driverRating={4.8}
+                totalReviews={124}
+                reviews={driverReviews}
+              />
             </div>
             
             {/* Right column */}

@@ -10,6 +10,8 @@ import PromoCodeSection from "./trip-planner/PromoCodeSection";
 import TripFeatures from "./trip-planner/TripFeatures";
 import TripOptions from "./trip-planner/TripOptions";
 import TripActions from "./trip-planner/TripActions";
+import VehicleTypeSelector from "./trip-planner/VehicleTypeSelector";
+import PriceComparison from "./trip-planner/PriceComparison";
 
 const PlanTripCard: React.FC = () => {
   const { toast } = useToast();
@@ -19,6 +21,37 @@ const PlanTripCard: React.FC = () => {
   const [additionalStops, setAdditionalStops] = useState<string[]>([""]);
   const [showPromoCode, setShowPromoCode] = useState(false);
   const [promoCode, setPromoCode] = useState("");
+  const [vehicleType, setVehicleType] = useState("economy");
+  const [showPriceComparison, setShowPriceComparison] = useState(false);
+
+  // Sample providers for price comparison
+  const providers = [
+    {
+      id: "provider1",
+      name: "Express Transfer",
+      price: 12.50,
+      rating: 4.5,
+      features: ["24/7 Support", "No hidden fees", "Free cancellation", "Live tracking"],
+      eta: "5 min",
+      recommended: true
+    },
+    {
+      id: "provider2",
+      name: "City Rides",
+      price: 10.75,
+      rating: 4.2,
+      features: ["Fixed price", "Professional drivers", "Payment options", "Free waiting time"],
+      eta: "7 min"
+    },
+    {
+      id: "provider3",
+      name: "Premium Cars",
+      price: 18.00,
+      rating: 4.8,
+      features: ["Premium vehicles", "Wi-Fi onboard", "Refreshments", "Meet & greet"],
+      eta: "10 min"
+    }
+  ];
 
   const handleAddStop = () => {
     setAdditionalStops([...additionalStops, ""]);
@@ -54,7 +87,7 @@ const PlanTripCard: React.FC = () => {
       return;
     }
 
-    let message = `Finding route from ${from} to ${to}`;
+    let message = `Finding route from ${from} to ${to} with ${vehicleType} vehicle`;
     if (additionalStops.some(stop => stop.trim() !== "")) {
       message += " with additional stops";
     }
@@ -77,6 +110,24 @@ const PlanTripCard: React.FC = () => {
       duration: 2000,
     });
   };
+  
+  const handleComparePrice = () => {
+    setShowPriceComparison(true);
+  };
+  
+  const handleSelectProvider = (providerId: string) => {
+    const provider = providers.find(p => p.id === providerId);
+    
+    if (provider) {
+      toast({
+        title: "Provider Selected",
+        description: `You've selected ${provider.name} at €${provider.price.toFixed(2)}`,
+        duration: 3000,
+      });
+    }
+    
+    setShowPriceComparison(false);
+  };
 
   return (
     <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border">
@@ -84,67 +135,82 @@ const PlanTripCard: React.FC = () => {
         <h3 className="text-lg font-semibold">Plan Your Trip</h3>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {/* Origin Input */}
-          <StopInput
-            value={from}
-            onChange={setFrom}
-            placeholder="From: Current Location"
+        {showPriceComparison ? (
+          <PriceComparison
+            providers={providers}
+            onSelect={handleSelectProvider}
+            onClose={() => setShowPriceComparison(false)}
           />
-          
-          {/* Destination Input */}
-          <StopInput
-            value={to}
-            onChange={setTo}
-            placeholder="To: Destination"
-          />
-
-          {/* Multiple Stops Section */}
-          {showMultiStops && (
-            <MultiStopSection
-              stops={additionalStops}
-              onStopChange={handleStopChange}
-              onAddStop={handleAddStop}
-              onRemoveStop={handleRemoveStop}
+        ) : (
+          <div className="space-y-3">
+            {/* Origin Input */}
+            <StopInput
+              value={from}
+              onChange={setFrom}
+              placeholder="From: Current Location"
             />
-          )}
-
-          {/* Promo Code Section */}
-          {showPromoCode && (
-            <PromoCodeSection
-              promoCode={promoCode}
-              onPromoCodeChange={setPromoCode}
+            
+            {/* Destination Input */}
+            <StopInput
+              value={to}
+              onChange={setTo}
+              placeholder="To: Destination"
             />
-          )}
 
-          {/* Departure Input */}
-          <div className="relative">
-            <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              type="text" 
-              placeholder="Departure: Now" 
-              className="pl-8"
-              onClick={handleScheduleRide}
+            {/* Multiple Stops Section */}
+            {showMultiStops && (
+              <MultiStopSection
+                stops={additionalStops}
+                onStopChange={handleStopChange}
+                onAddStop={handleAddStop}
+                onRemoveStop={handleRemoveStop}
+              />
+            )}
+
+            {/* Promo Code Section */}
+            {showPromoCode && (
+              <PromoCodeSection
+                promoCode={promoCode}
+                onPromoCodeChange={setPromoCode}
+              />
+            )}
+
+            {/* Vehicle Type Selector */}
+            <VehicleTypeSelector 
+              selectedVehicleType={vehicleType}
+              onVehicleTypeChange={setVehicleType}
             />
+
+            {/* Departure Input */}
+            <div className="relative">
+              <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                type="text" 
+                placeholder="Departure: Now" 
+                className="pl-8"
+                onClick={handleScheduleRide}
+              />
+            </div>
+
+            {/* Trip Options */}
+            <TripOptions
+              showMultiStops={showMultiStops}
+              showPromoCode={showPromoCode}
+              onToggleMultiStops={toggleMultiStops}
+              onTogglePromoCode={togglePromoCode}
+            />
+
+            {/* Trip Actions */}
+            <TripActions
+              onSchedule={handleScheduleRide}
+              onFindRoute={handleFindRoute}
+              onComparePrice={handleComparePrice}
+            />
+
+            {/* Trip Features */}
+            <TripFeatures />
           </div>
-
-          {/* Trip Options */}
-          <TripOptions
-            showMultiStops={showMultiStops}
-            showPromoCode={showPromoCode}
-            onToggleMultiStops={toggleMultiStops}
-            onTogglePromoCode={togglePromoCode}
-          />
-
-          {/* Trip Actions */}
-          <TripActions
-            onSchedule={handleScheduleRide}
-            onFindRoute={handleFindRoute}
-          />
-
-          {/* Trip Features */}
-          <TripFeatures />
-        </div>
+        )}
       </CardContent>
     </Card>
   );
