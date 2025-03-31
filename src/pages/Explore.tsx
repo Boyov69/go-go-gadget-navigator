@@ -1,30 +1,30 @@
+
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import GoogleMap from "@/components/GoogleMap";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Map, Coffee, Utensils, Hotel, LocalTaxi, ShoppingBag, Landmark } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import GoogleMap from "@/components/GoogleMap";
+import PopularDestinations from "@/components/PopularDestinations";
+import { Search, MapPin, Car, Bus, Train, Plane } from "lucide-react";
 
 const ExplorePage: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Sample places of interest
-  const placesOfInterest = [
-    { position: { lat: 51.51, lng: -0.11 }, title: "Coffee Shop", icon: Coffee },
-    { position: { lat: 51.505, lng: -0.09 }, title: "Restaurant", icon: Utensils },
-    { position: { lat: 51.515, lng: -0.08 }, title: "Hotel", icon: Hotel },
-    { position: { lat: 51.49, lng: -0.12 }, title: "Taxi Stand", icon: LocalTaxi },
-    { position: { lat: 51.51, lng: -0.13 }, title: "Shopping Mall", icon: ShoppingBag },
-    { position: { lat: 51.52, lng: -0.1 }, title: "Tourist Attraction", icon: Landmark },
-  ];
-
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+  
+  // Sample locations for the map - Belgian cities
+  const popularLocations = [
+    { position: { lat: 50.8503, lng: 4.3517 }, title: "Brussels" },
+    { position: { lat: 51.2194, lng: 4.4025 }, title: "Antwerp" },
+    { position: { lat: 51.0543, lng: 3.7174 }, title: "Ghent" },
+    { position: { lat: 50.6326, lng: 5.5797 }, title: "Liège" },
+    { position: { lat: 51.3097, lng: 3.2340 }, title: "Bruges" },
+  ];
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -34,101 +34,81 @@ const ExplorePage: React.FC = () => {
         <Navbar toggleSidebar={toggleSidebar} />
         
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Map className="h-5 w-5 text-primary" />
-                  Explore Your Surroundings
-                </CardTitle>
-                <CardDescription>
-                  Discover interesting places and attractions nearby
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative mb-6">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder="Search for places, attractions, restaurants..."
-                    className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                
-                <Tabs defaultValue="all">
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="food">Food & Drink</TabsTrigger>
-                    <TabsTrigger value="attractions">Attractions</TabsTrigger>
-                    <TabsTrigger value="hotels">Hotels</TabsTrigger>
-                    <TabsTrigger value="transport">Transport</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="all" className="mt-0">
-                    <GoogleMap 
-                      height="500px"
-                      center={{ lat: 51.505, lng: -0.09 }}
-                      markers={placesOfInterest.map(place => ({
-                        position: place.position,
-                        title: place.title
-                      }))}
-                      zoom={13}
-                      mapStyle="retro"
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column - Search and filters */}
+            <div className="lg:col-span-1 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Explore</CardTitle>
+                  <CardDescription>Discover places and attractions</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search places..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                      {placesOfInterest.map((place, index) => (
-                        <Card key={index}>
-                          <CardContent className="p-4 flex items-center gap-3">
-                            <div className="bg-primary/10 p-2 rounded-full">
-                              <place.icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <h4 className="font-medium">{place.title}</h4>
-                              <p className="text-xs text-muted-foreground">
-                                {(Math.random() * 5).toFixed(1)} km away
-                              </p>
-                            </div>
-                            <Button size="sm" className="ml-auto">View</Button>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </TabsContent>
+                  </div>
                   
-                  {/* Other tab contents would be similar but with filtered data */}
-                  <TabsContent value="food" className="mt-0">
-                    <div className="p-8 text-center text-muted-foreground">
-                      <Utensils className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                      <p>Explore restaurants and cafes nearby</p>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Transportation</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" className="gap-1">
+                        <Car className="h-3.5 w-3.5" /> Car
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1">
+                        <Bus className="h-3.5 w-3.5" /> Bus
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1">
+                        <Train className="h-3.5 w-3.5" /> Train
+                      </Button>
+                      <Button size="sm" variant="outline" className="gap-1">
+                        <Plane className="h-3.5 w-3.5" /> Plane
+                      </Button>
                     </div>
-                  </TabsContent>
+                  </div>
                   
-                  <TabsContent value="attractions" className="mt-0">
-                    <div className="p-8 text-center text-muted-foreground">
-                      <Landmark className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                      <p>Discover tourist attractions in this area</p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="hotels" className="mt-0">
-                    <div className="p-8 text-center text-muted-foreground">
-                      <Hotel className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                      <p>Find accommodations nearby</p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="transport" className="mt-0">
-                    <div className="p-8 text-center text-muted-foreground">
-                      <LocalTaxi className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                      <p>Locate transportation options</p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+                  <div className="pt-2">
+                    <h4 className="text-sm font-medium mb-2">Nearby Places</h4>
+                    {popularLocations.map((location, index) => (
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        className="w-full justify-start text-left mb-1"
+                      >
+                        <MapPin className="h-4 w-4 mr-2" />
+                        <span>{location.title}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Right column - Map */}
+            <div className="lg:col-span-2">
+              <Card className="h-full">
+                <CardHeader className="pb-2">
+                  <CardTitle>Discover Belgium</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <GoogleMap
+                    height="600px"
+                    markers={popularLocations}
+                    center={{ lat: 50.8503, lng: 4.3517 }}
+                    zoom={8}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <PopularDestinations />
           </div>
         </main>
       </div>
