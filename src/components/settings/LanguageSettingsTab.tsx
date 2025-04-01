@@ -7,7 +7,7 @@ import { useLanguage, SupportedLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 
 const LanguageSettingsTab: React.FC = () => {
-  const { t, language, setLanguage } = useLanguage();
+  const { t, language, setLanguage, availableLanguages } = useLanguage();
   const { toast } = useToast();
 
   const handleLanguageChange = (value: string) => {
@@ -17,7 +17,7 @@ const LanguageSettingsTab: React.FC = () => {
   const handleSaveSettings = () => {
     toast({
       title: t("settings.saveLanguage"),
-      description: "Your language settings have been updated",
+      description: t("settings.language.updatedMessage"),
       duration: 3000,
     });
   };
@@ -35,16 +35,15 @@ const LanguageSettingsTab: React.FC = () => {
           <Label htmlFor="language">{t("settings.language.appLanguage")}</Label>
           <select 
             id="language"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
           >
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="es">Español</option>
-            <option value="nl">Nederlands</option>
-            <option value="it">Italiano</option>
+            {availableLanguages.map(lang => (
+              <option key={lang.code} value={lang.code}>
+                {lang.flag} {lang.name}
+              </option>
+            ))}
           </select>
         </div>
       </CardContent>

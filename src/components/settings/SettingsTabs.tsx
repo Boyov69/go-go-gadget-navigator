@@ -41,7 +41,7 @@ const SettingsTabs: React.FC = () => {
             </TabsTrigger>
             <TabsTrigger value="location" className="w-full justify-start gap-2 pl-2 lg:pl-3">
               <MapPin className="h-4 w-4" />
-              <span>Location</span>
+              <span>{t("settings.location.title")}</span>
             </TabsTrigger>
             <TabsTrigger value="appearance" className="w-full justify-start gap-2 pl-2 lg:pl-3">
               <Moon className="h-4 w-4" />
@@ -53,7 +53,7 @@ const SettingsTabs: React.FC = () => {
             </TabsTrigger>
             <TabsTrigger value="payment" className="w-full justify-start gap-2 pl-2 lg:pl-3">
               <CreditCard className="h-4 w-4" />
-              <span>Payment</span>
+              <span>{t("settings.payment.title")}</span>
             </TabsTrigger>
           </TabsList>
         </ScrollArea>

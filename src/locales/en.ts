@@ -1,4 +1,3 @@
-
 export const en = {
   common: {
     search: "Search",
@@ -137,6 +136,12 @@ export const en = {
       location: "Share my location",
       data: "Allow data collection"
     },
+    location: {
+      title: "Location Settings",
+      description: "Manage your location preferences.",
+      defaultLocation: "Default Location",
+      trackingPermissions: "Location Tracking Permissions"
+    },
     appearance: {
       title: "Appearance",
       description: "Customize how the application looks.",
@@ -145,7 +150,14 @@ export const en = {
     language: {
       title: "Language Settings",
       description: "Select your preferred language.",
-      appLanguage: "Application Language"
+      appLanguage: "Application Language",
+      updatedMessage: "Your language settings have been updated"
+    },
+    payment: {
+      title: "Payment Settings",
+      description: "Manage your payment methods and preferences.",
+      methods: "Payment Methods",
+      defaultMethod: "Default Payment Method"
     },
     saveChanges: "Save Changes",
     updateProfile: "Update Profile",
