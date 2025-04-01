@@ -18,6 +18,7 @@ import SavedTripsPage from "./pages/SavedTrips";
 import FavoritesPage from "./pages/Favorites";
 import AdminDashboard from "./pages/AdminDashboard";
 import RoadAssistancePage from "./pages/RoadAssistance";
+import PublicTransportPage from "./pages/PublicTransport";
 
 // Removed the duplicate QueryClient since it's already in main.tsx
 const App = () => (
@@ -31,6 +32,7 @@ const App = () => (
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/navigate" element={<NavigatePage />} />
         <Route path="/road-assistance" element={<RoadAssistancePage />} />
+        <Route path="/public-transport" element={<PublicTransportPage />} />
 
         {/* User routes */}
         <Route path="/saved-trips" element={<SavedTripsPage />} />

@@ -38,7 +38,7 @@ export const useLanguage = () => useContext(LanguageContext);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Available languages with their details
-  const availableLanguages = [
+  const availableLanguages: { code: SupportedLanguage; name: string; flag: string }[] = [
     { code: "en", name: "English", flag: "🇬🇧" },
     { code: "fr", name: "Français", flag: "🇫🇷" },
     { code: "de", name: "Deutsch", flag: "🇩🇪" },
