@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -33,12 +32,12 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactions
     }
   };
 
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "destructive" | "outline" | "secondary" => {
     switch (status) {
       case 'completed':
-        return 'success';
+        return 'secondary';
       case 'pending':
-        return 'warning';
+        return 'outline';
       case 'failed':
         return 'destructive';
       default:
@@ -46,7 +45,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactions
     }
   };
 
-  const getTypeVariant = (type: string) => {
+  const getTypeVariant = (type: string): "default" | "destructive" | "outline" | "secondary" => {
     switch (type) {
       case 'deposit':
         return 'default';
@@ -55,7 +54,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactions
       case 'payment':
         return 'outline';
       case 'refund':
-        return 'success';
+        return 'secondary';
       default:
         return 'default';
     }

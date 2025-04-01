@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { WalletCard } from './WalletCard';
 import { TransactionsList } from './TransactionsList';
-import { walletService, Wallet, Transaction, FiatCurrency, CryptoCurrency, WalletCurrency } from '@/services/wallet';
+import { walletService, Transaction, FiatCurrency, CryptoCurrency, WalletCurrency } from '@/services/wallet';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Search, Wallet } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
+import type { Wallet } from '@/services/wallet';
 
 export const WalletDashboard: React.FC = () => {
   const { toast } = useToast();
@@ -127,7 +127,10 @@ export const WalletDashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Wallet className="h-6 w-6" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+            <path d="M2 9a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9Z"></path>
+            <path d="M4 3h16"></path>
+          </svg>
           Provider Wallets
         </h2>
 
@@ -251,7 +254,6 @@ export const WalletDashboard: React.FC = () => {
         )}
       </Tabs>
 
-      {/* Transaction Dialog */}
       <Dialog open={isTransactionDialogOpen} onOpenChange={setIsTransactionDialogOpen}>
         <DialogContent>
           <DialogHeader>
