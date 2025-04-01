@@ -5,7 +5,8 @@ import {
   WalletCurrency, 
   WalletCurrencyType,
   CryptoCurrency,
-  WalletServiceInterface
+  WalletServiceInterface,
+  FiatCurrency
 } from '@/types/wallet';
 import { mockWallets, mockTransactions } from './mockWalletData';
 
@@ -161,5 +162,6 @@ class ApiWalletService implements WalletServiceInterface {
 // In the future, this could be switched to the API implementation
 export const walletService: WalletServiceInterface = new MockWalletService();
 
-// Re-export types from the types file for backward compatibility
-export { Wallet, Transaction, WalletCurrency, WalletCurrencyType, FiatCurrency, CryptoCurrency } from '@/types/wallet';
+// Re-export types from the types file
+export type { Wallet, Transaction, WalletCurrency, WalletServiceInterface };
+export { WalletCurrencyType, FiatCurrency, CryptoCurrency };

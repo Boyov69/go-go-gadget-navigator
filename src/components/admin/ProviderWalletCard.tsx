@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { walletService, Wallet, WalletCurrencyType } from '@/services/wallet';
+import { walletService } from '@/services/wallet';
+import type { Wallet, WalletCurrencyType } from '@/types/wallet';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';

@@ -16,9 +16,11 @@ export function useWalletData() {
   } = useQuery({
     queryKey: ['admin-wallets'],
     queryFn: () => walletService.getAllWallets(),
-    onError: (error: Error) => {
-      setWalletsError(error);
-      console.error('Error fetching wallets:', error);
+    meta: {
+      onError: (error: Error) => {
+        setWalletsError(error);
+        console.error('Error fetching wallets:', error);
+      }
     }
   });
 
@@ -30,9 +32,11 @@ export function useWalletData() {
   } = useQuery({
     queryKey: ['admin-transactions'],
     queryFn: () => walletService.getAllTransactions(),
-    onError: (error: Error) => {
-      setTransactionsError(error);
-      console.error('Error fetching transactions:', error);
+    meta: {
+      onError: (error: Error) => {
+        setTransactionsError(error);
+        console.error('Error fetching transactions:', error);
+      }
     }
   });
 
@@ -62,9 +66,11 @@ export function useWalletTransactions(providerId: string | undefined) {
     queryKey: ['wallet-transactions', providerId, page, pageSize],
     queryFn: () => providerId ? walletService.getTransactions(providerId) : Promise.resolve([]),
     enabled: !!providerId,
-    onError: (error: Error) => {
-      setError(error);
-      console.error('Error fetching wallet transactions:', error);
+    meta: {
+      onError: (error: Error) => {
+        setError(error);
+        console.error('Error fetching wallet transactions:', error);
+      }
     }
   });
   
