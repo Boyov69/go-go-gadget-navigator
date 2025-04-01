@@ -13,7 +13,9 @@ import {
   Package,
   Map,
   Train,
-  Bike
+  Bike,
+  Tool,
+  AlertTriangle
 } from "lucide-react";
 
 const QuickTools: React.FC = () => {
@@ -31,14 +33,20 @@ const QuickTools: React.FC = () => {
           description: "Starting navigation service",
           duration: 2000,
         });
-        // Stay on current page, this would normally open the navigation feature
+        navigate("/navigate");
       }
     },
     { 
       icon: Map, 
       label: "Explore Map", 
       color: "bg-green-100 text-green-700", 
-      action: () => navigate("/") // Go to home page which has the map
+      action: () => navigate("/explore")
+    },
+    { 
+      icon: AlertTriangle, 
+      label: "Road Help", 
+      color: "bg-red-100 text-red-700", 
+      to: "/road-assistance"
     },
     { 
       icon: MapPin, 
@@ -50,7 +58,7 @@ const QuickTools: React.FC = () => {
           description: "Opening your saved locations",
           duration: 2000,
         });
-        navigate("/");
+        navigate("/saved-trips");
       }
     },
     { 
@@ -69,7 +77,7 @@ const QuickTools: React.FC = () => {
     { 
       icon: Train, 
       label: "Train", 
-      color: "bg-red-100 text-red-700", 
+      color: "bg-indigo-100 text-indigo-700", 
       action: () => {
         toast({
           title: "Train Schedules",

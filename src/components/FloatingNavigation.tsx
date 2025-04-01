@@ -9,7 +9,8 @@ import {
   Settings,
   Heart,
   Package,
-  Map
+  Map,
+  AlertTriangle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -45,6 +46,12 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
       label: "Explore",
       value: "explore",
       action: () => navigate("/explore")
+    },
+    {
+      icon: <AlertTriangle className="h-4 w-4" />,
+      label: "Road Help",
+      value: "roadhelp",
+      action: () => navigate("/road-assistance")
     },
     {
       icon: <Package className="h-4 w-4" />,
