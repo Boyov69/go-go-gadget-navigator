@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wallet, WalletCurrency, FiatCurrency, CryptoCurrency } from '@/services/wallet';
+import { Wallet, WalletCurrency, FiatCurrency, CryptoCurrency } from '@/types/wallet';
 
 interface WalletTransactionDialogProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ interface WalletTransactionDialogProps {
   onSubmit: () => void;
 }
 
-export function WalletTransactionDialog({
+export const WalletTransactionDialog: React.FC<WalletTransactionDialogProps> = React.memo(({
   isOpen,
   onOpenChange,
   wallet,
@@ -30,7 +30,13 @@ export function WalletTransactionDialog({
   onTransactionAmountChange,
   onTransactionCurrencyChange,
   onSubmit
-}: WalletTransactionDialogProps) {
+}) => {
+  // Determine step size based on currency
+  const getStepSize = (currency: WalletCurrency) => {
+    if (currency === 'BTC' || currency === 'ETH') return "0.00000001";
+    return "0.01";
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -73,7 +79,7 @@ export function WalletTransactionDialog({
             <Input
               id="amount"
               type="number"
-              step={transactionCurrency.includes("BTC") || transactionCurrency.includes("ETH") ? "0.00000001" : "0.01"}
+              step={getStepSize(transactionCurrency)}
               placeholder="Enter amount"
               value={transactionAmount}
               onChange={(e) => onTransactionAmountChange(e.target.value)}
@@ -92,4 +98,6 @@ export function WalletTransactionDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+WalletTransactionDialog.displayName = 'WalletTransactionDialog';

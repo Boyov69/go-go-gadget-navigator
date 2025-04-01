@@ -1,17 +1,25 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from 'lucide-react';
 import { TransactionsList } from './TransactionsList';
-import { walletService, FiatCurrency, WalletCurrency } from '@/services/wallet';
+import { walletService } from '@/services/wallet';
 import { useToast } from "@/hooks/use-toast";
-import type { Wallet } from '@/services/wallet';
-import { useWalletData, useWalletTransactions } from '@/hooks/useWalletData';
+import type { Wallet, WalletCurrency } from '@/types/wallet';
+import { FiatCurrency } from '@/types/wallet';
+import { 
+  useWalletData, 
+  useWalletTransactions,
+  useFilteredTransactions 
+} from '@/hooks/useWalletData';
 import { WalletDashboardHeader } from './WalletDashboardHeader';
 import { WalletListings } from './WalletListings';
 import { WalletDetailsView } from './WalletDetailsView';
 import { WalletTransactionDialog } from './WalletTransactionDialog';
+import { TransactionsListSkeleton } from './TransactionsListSkeleton';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export const WalletDashboard: React.FC = () => {
   const { toast } = useToast();
@@ -29,33 +37,40 @@ export const WalletDashboard: React.FC = () => {
     isLoadingWallets,
     isLoadingTransactions,
     refetchWallets,
-    refetchTransactions
+    refetchTransactions,
+    walletsError,
+    transactionsError
   } = useWalletData();
 
   const {
     walletTransactions,
     isLoadingWalletTransactions,
-    refetchWalletTransactions
+    refetchWalletTransactions,
+    error: walletTransactionsError,
+    pagination
   } = useWalletTransactions(selectedWallet?.providerId);
 
-  const filteredTransactions = transactions?.filter(transaction => 
-    transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.providerId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Use memoized filtered transactions
+  const filteredTransactions = useFilteredTransactions(transactions, searchTerm);
 
-  const handleWalletClick = (wallet: Wallet) => {
+  const handleWalletClick = useCallback((wallet: Wallet) => {
     setSelectedWallet(wallet);
+    
+    // Default to the currency of the wallet's first balance if available
+    if (wallet.balances.length > 0) {
+      setTransactionCurrency(wallet.balances[0].currency);
+    }
+    
     setSelectedTab('wallet-details');
-  };
+  }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     refetchWallets();
     refetchTransactions();
     if (selectedWallet) {
       refetchWalletTransactions();
     }
-  };
+  }, [refetchWallets, refetchTransactions, refetchWalletTransactions, selectedWallet]);
 
   const handleAddFunds = async () => {
     if (!selectedWallet || !transactionAmount || isNaN(parseFloat(transactionAmount)) || parseFloat(transactionAmount) <= 0) {
@@ -102,89 +117,105 @@ export const WalletDashboard: React.FC = () => {
     }
   };
 
-  const openAddFundsDialog = () => {
+  const openAddFundsDialog = useCallback(() => {
     setTransactionType('deposit');
     setIsTransactionDialogOpen(true);
-  };
+  }, []);
 
-  const openWithdrawDialog = () => {
+  const openWithdrawDialog = useCallback(() => {
     setTransactionType('withdrawal');
     setIsTransactionDialogOpen(true);
+  }, []);
+
+  const renderError = (error: Error | null, title: string) => {
+    if (!error) return null;
+    
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription>{error.message}</AlertDescription>
+      </Alert>
+    );
   };
 
-  if (isLoadingWallets || isLoadingTransactions) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <WalletDashboardHeader 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        onRefresh={handleRefresh}
-        isLoading={isLoadingWallets || isLoadingTransactions}
-      />
-      
-      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList>
-          <TabsTrigger value="wallets">All Wallets</TabsTrigger>
-          <TabsTrigger value="transactions">All Transactions</TabsTrigger>
-          {selectedWallet && (
-            <TabsTrigger value="wallet-details">
-              {selectedWallet.providerName}'s Wallet
-            </TabsTrigger>
-          )}
-        </TabsList>
+    <ErrorBoundary>
+      <div className="space-y-6">
+        <WalletDashboardHeader 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onRefresh={handleRefresh}
+          isLoading={isLoadingWallets || isLoadingTransactions}
+        />
         
-        <TabsContent value="wallets" className="mt-4">
-          <WalletListings 
-            wallets={wallets} 
-            searchTerm={searchTerm}
-            onWalletClick={handleWalletClick}
-          />
-        </TabsContent>
+        {walletsError && renderError(walletsError, "Failed to load wallets")}
+        {transactionsError && renderError(transactionsError, "Failed to load transactions")}
         
-        <TabsContent value="transactions" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>All Transactions</CardTitle>
-              <CardDescription>Complete transaction history across all providers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TransactionsList transactions={filteredTransactions || []} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        {selectedWallet && (
-          <TabsContent value="wallet-details" className="mt-4">
-            <WalletDetailsView
-              wallet={selectedWallet}
-              transactions={walletTransactions}
-              isLoading={isLoadingWalletTransactions}
-              onAddFunds={openAddFundsDialog}
-              onWithdraw={openWithdrawDialog}
+        <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+          <TabsList>
+            <TabsTrigger value="wallets">All Wallets</TabsTrigger>
+            <TabsTrigger value="transactions">All Transactions</TabsTrigger>
+            {selectedWallet && (
+              <TabsTrigger value="wallet-details">
+                {selectedWallet.providerName}'s Wallet
+              </TabsTrigger>
+            )}
+          </TabsList>
+          
+          <TabsContent value="wallets" className="mt-4">
+            <WalletListings 
+              wallets={wallets} 
+              searchTerm={searchTerm}
+              onWalletClick={handleWalletClick}
+              isLoading={isLoadingWallets}
             />
           </TabsContent>
-        )}
-      </Tabs>
+          
+          <TabsContent value="transactions" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Transactions</CardTitle>
+                <CardDescription>Complete transaction history across all providers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingTransactions ? (
+                  <TransactionsListSkeleton />
+                ) : (
+                  <TransactionsList transactions={filteredTransactions || []} />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {selectedWallet && (
+            <TabsContent value="wallet-details" className="mt-4">
+              <WalletDetailsView
+                wallet={selectedWallet}
+                transactions={walletTransactions}
+                isLoading={isLoadingWalletTransactions}
+                error={walletTransactionsError}
+                onAddFunds={openAddFundsDialog}
+                onWithdraw={openWithdrawDialog}
+                pagination={pagination}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
 
-      <WalletTransactionDialog
-        isOpen={isTransactionDialogOpen}
-        onOpenChange={setIsTransactionDialogOpen}
-        wallet={selectedWallet}
-        transactionType={transactionType}
-        transactionAmount={transactionAmount}
-        transactionCurrency={transactionCurrency}
-        onTransactionTypeChange={setTransactionType}
-        onTransactionAmountChange={setTransactionAmount}
-        onTransactionCurrencyChange={setTransactionCurrency}
-        onSubmit={handleAddFunds}
-      />
-    </div>
+        <WalletTransactionDialog
+          isOpen={isTransactionDialogOpen}
+          onOpenChange={setIsTransactionDialogOpen}
+          wallet={selectedWallet}
+          transactionType={transactionType}
+          transactionAmount={transactionAmount}
+          transactionCurrency={transactionCurrency}
+          onTransactionTypeChange={setTransactionType}
+          onTransactionAmountChange={setTransactionAmount}
+          onTransactionCurrencyChange={setTransactionCurrency}
+          onSubmit={handleAddFunds}
+        />
+      </div>
+    </ErrorBoundary>
   );
 };

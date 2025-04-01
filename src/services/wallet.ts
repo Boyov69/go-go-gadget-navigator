@@ -1,119 +1,18 @@
 
-export enum WalletCurrencyType {
-  FIAT = "fiat",
-  CRYPTO = "crypto"
-}
+import { 
+  Wallet, 
+  Transaction, 
+  WalletCurrency, 
+  WalletCurrencyType,
+  CryptoCurrency,
+  WalletServiceInterface
+} from '@/types/wallet';
+import { mockWallets, mockTransactions } from './mockWalletData';
 
-export enum FiatCurrency {
-  EUR = "EUR",
-  USD = "USD",
-  GBP = "GBP"
-}
-
-export enum CryptoCurrency {
-  BTC = "BTC",
-  ETH = "ETH",
-  USDT = "USDT",
-  SOL = "SOL"
-}
-
-export type WalletCurrency = FiatCurrency | CryptoCurrency;
-
-export interface Transaction {
-  id: string;
-  providerId: string;
-  amount: number;
-  currency: WalletCurrency;
-  type: "deposit" | "withdrawal" | "payment" | "refund";
-  status: "pending" | "completed" | "failed";
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Wallet {
-  id: string;
-  providerId: string;
-  providerName: string;
-  balances: {
-    currency: WalletCurrency;
-    type: WalletCurrencyType;
-    amount: number;
-  }[];
-  lastUpdated: string;
-}
-
-// Mock wallet service
-class WalletService {
-  // Mock data
-  private wallets: Wallet[] = [
-    {
-      id: "wallet-1",
-      providerId: "provider-1",
-      providerName: "Express Transport",
-      balances: [
-        { currency: FiatCurrency.EUR, type: WalletCurrencyType.FIAT, amount: 5420.50 },
-        { currency: CryptoCurrency.BTC, type: WalletCurrencyType.CRYPTO, amount: 0.15 }
-      ],
-      lastUpdated: new Date().toISOString()
-    },
-    {
-      id: "wallet-2",
-      providerId: "provider-2",
-      providerName: "Cargo Masters",
-      balances: [
-        { currency: FiatCurrency.EUR, type: WalletCurrencyType.FIAT, amount: 1250.75 },
-        { currency: CryptoCurrency.ETH, type: WalletCurrencyType.CRYPTO, amount: 2.5 }
-      ],
-      lastUpdated: new Date().toISOString()
-    },
-    {
-      id: "wallet-3",
-      providerId: "provider-3",
-      providerName: "Swift Delivery",
-      balances: [
-        { currency: FiatCurrency.USD, type: WalletCurrencyType.FIAT, amount: 3750.25 },
-        { currency: CryptoCurrency.SOL, type: WalletCurrencyType.CRYPTO, amount: 45.8 }
-      ],
-      lastUpdated: new Date().toISOString()
-    }
-  ];
-
-  private transactions: Transaction[] = [
-    {
-      id: "tx-1",
-      providerId: "provider-1",
-      amount: 500,
-      currency: FiatCurrency.EUR,
-      type: "deposit",
-      status: "completed",
-      description: "Monthly payment",
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000 * 2).toISOString()
-    },
-    {
-      id: "tx-2",
-      providerId: "provider-1",
-      amount: 0.05,
-      currency: CryptoCurrency.BTC,
-      type: "deposit",
-      status: "completed",
-      description: "Crypto payment",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000).toISOString()
-    },
-    {
-      id: "tx-3",
-      providerId: "provider-2",
-      amount: 250.75,
-      currency: FiatCurrency.EUR,
-      type: "withdrawal",
-      status: "pending",
-      description: "Withdrawal request",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  ];
+// Mock wallet service implementation
+class MockWalletService implements WalletServiceInterface {
+  private wallets: Wallet[] = [...mockWallets];
+  private transactions: Transaction[] = [...mockTransactions];
 
   // Get all wallets (super admin only)
   async getAllWallets(): Promise<Wallet[]> {
@@ -213,4 +112,54 @@ class WalletService {
   }
 }
 
-export const walletService = new WalletService();
+// Create a real API service implementation that can be used later
+class ApiWalletService implements WalletServiceInterface {
+  private baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  // Implementation for future real API calls
+  async getAllWallets(): Promise<Wallet[]> {
+    // This would be replaced with actual API call
+    return Promise.resolve([]);
+  }
+
+  async getWalletByProviderId(providerId: string): Promise<Wallet | null> {
+    // This would be replaced with actual API call
+    return Promise.resolve(null);
+  }
+
+  async getTransactions(providerId: string): Promise<Transaction[]> {
+    // This would be replaced with actual API call
+    return Promise.resolve([]);
+  }
+
+  async getAllTransactions(): Promise<Transaction[]> {
+    // This would be replaced with actual API call
+    return Promise.resolve([]);
+  }
+
+  async addFunds(providerId: string, amount: number, currency: WalletCurrency): Promise<Transaction> {
+    // This would be replaced with actual API call
+    throw new Error("Not implemented");
+  }
+
+  async withdrawFunds(providerId: string, amount: number, currency: WalletCurrency): Promise<Transaction> {
+    // This would be replaced with actual API call
+    throw new Error("Not implemented");
+  }
+
+  async updateTransactionStatus(transactionId: string, status: "pending" | "completed" | "failed"): Promise<Transaction> {
+    // This would be replaced with actual API call
+    throw new Error("Not implemented");
+  }
+}
+
+// Export the mock service by default
+// In the future, this could be switched to the API implementation
+export const walletService: WalletServiceInterface = new MockWalletService();
+
+// Re-export types from the types file for backward compatibility
+export { Wallet, Transaction, WalletCurrency, WalletCurrencyType, FiatCurrency, CryptoCurrency } from '@/types/wallet';

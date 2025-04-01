@@ -2,27 +2,36 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet } from '@/services/wallet';
+import { Wallet, Transaction } from '@/types/wallet';
 import { WalletCard } from './WalletCard';
 import { TransactionsList } from './TransactionsList';
-import { Loader2 } from 'lucide-react';
-import type { Transaction } from '@/services/wallet';
+import { Loader2, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TransactionsListSkeleton } from './TransactionsListSkeleton';
 
 interface WalletDetailsViewProps {
   wallet: Wallet;
   transactions: Transaction[] | undefined;
   isLoading: boolean;
+  error?: Error | null;
   onAddFunds: () => void;
   onWithdraw: () => void;
+  pagination?: {
+    page: number;
+    totalPages: number;
+    setPage: (page: number) => void;
+  };
 }
 
-export function WalletDetailsView({
+export const WalletDetailsView: React.FC<WalletDetailsViewProps> = React.memo(({
   wallet,
   transactions,
   isLoading,
+  error,
   onAddFunds,
-  onWithdraw
-}: WalletDetailsViewProps) {
+  onWithdraw,
+  pagination
+}) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <Card className="lg:col-span-1">
@@ -58,14 +67,25 @@ export function WalletDetailsView({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
+            <TransactionsListSkeleton />
+          ) : error ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                {error.message || 'Failed to load transactions'}
+              </AlertDescription>
+            </Alert>
           ) : (
-            <TransactionsList transactions={transactions || []} />
+            <TransactionsList 
+              transactions={transactions || []} 
+              pagination={pagination}
+            />
           )}
         </CardContent>
       </Card>
     </div>
   );
-}
+});
+
+WalletDetailsView.displayName = 'WalletDetailsView';

@@ -1,24 +1,36 @@
 
 import React from 'react';
 import { WalletCard } from './WalletCard';
-import type { Wallet } from '@/services/wallet';
+import type { Wallet } from '@/types/wallet';
+import { WalletCardSkeleton } from './WalletCardSkeleton';
+import { useFilteredWallets } from '@/hooks/useWalletData';
 
 interface WalletListingsProps {
   wallets: Wallet[] | undefined;
   searchTerm: string;
   onWalletClick: (wallet: Wallet) => void;
+  isLoading?: boolean;
 }
 
-export function WalletListings({ 
+export const WalletListings: React.FC<WalletListingsProps> = React.memo(({ 
   wallets, 
   searchTerm, 
-  onWalletClick 
-}: WalletListingsProps) {
-  const filteredWallets = wallets?.filter(wallet => 
-    wallet.providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    wallet.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    wallet.providerId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  onWalletClick,
+  isLoading 
+}) => {
+  // Use the memoized filtered wallets
+  const filteredWallets = useFilteredWallets(wallets, searchTerm);
+
+  if (isLoading) {
+    // Show skeleton UI during loading
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array(6).fill(0).map((_, index) => (
+          <WalletCardSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
   if (!filteredWallets || filteredWallets.length === 0) {
     return (
@@ -39,4 +51,6 @@ export function WalletListings({
       ))}
     </div>
   );
-}
+});
+
+WalletListings.displayName = 'WalletListings';

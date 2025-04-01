@@ -2,25 +2,16 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wallet, WalletCurrency, WalletCurrencyType } from "@/services/wallet";
+import { Wallet, WalletCurrencyType } from "@/types/wallet";
 import { Banknote, Bitcoin } from "lucide-react";
+import { formatCurrency } from "@/utils/currencyUtils";
 
 interface WalletCardProps {
   wallet: Wallet;
   onClick?: () => void;
 }
 
-const currencySymbols: Record<WalletCurrency, string> = {
-  EUR: "€",
-  USD: "$",
-  GBP: "£",
-  BTC: "₿",
-  ETH: "Ξ",
-  USDT: "₮",
-  SOL: "◎"
-};
-
-export const WalletCard: React.FC<WalletCardProps> = ({ wallet, onClick }) => {
+export const WalletCard: React.FC<WalletCardProps> = React.memo(({ wallet, onClick }) => {
   const totalFiat = wallet.balances
     .filter(b => b.type === WalletCurrencyType.FIAT)
     .reduce((total, balance) => total + balance.amount, 0);
@@ -54,7 +45,7 @@ export const WalletCard: React.FC<WalletCardProps> = ({ wallet, onClick }) => {
                   <div key={i} className="flex justify-between">
                     <span>{balance.currency}</span>
                     <span className="font-semibold">
-                      {currencySymbols[balance.currency]}{balance.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {formatCurrency(balance.amount, balance.currency, balance.type)}
                     </span>
                   </div>
                 ))}
@@ -77,10 +68,7 @@ export const WalletCard: React.FC<WalletCardProps> = ({ wallet, onClick }) => {
                   <div key={i} className="flex justify-between">
                     <span>{balance.currency}</span>
                     <span className="font-semibold">
-                      {currencySymbols[balance.currency]}{balance.amount.toLocaleString(undefined, {
-                        minimumFractionDigits: balance.amount < 1 ? 8 : 2,
-                        maximumFractionDigits: balance.amount < 1 ? 8 : 4
-                      })}
+                      {formatCurrency(balance.amount, balance.currency, balance.type)}
                     </span>
                   </div>
                 ))}
@@ -93,4 +81,6 @@ export const WalletCard: React.FC<WalletCardProps> = ({ wallet, onClick }) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+WalletCard.displayName = 'WalletCard';
