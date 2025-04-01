@@ -35,19 +35,19 @@ export const useDriverSimulation = ({ destination }: UseDriverSimulationProps) =
   useEffect(() => {
     const timer = setTimeout(() => {
       const newDriverInfo = {
-        id: "drv-12345",
+        id: "tech-12345",
         name: "Alex Johnson",
         photo: "/placeholder.svg",
         rating: 4.8,
         vehicle: {
-          model: "Toyota Hiace",
+          model: "Ford Transit",
           color: "White",
-          licensePlate: "AB 123 CD",
+          licensePlate: "RA 123 SV",
         },
-        eta: 7,
-        distance: 2.3,
+        eta: 9,
+        distance: 3.2,
         location: {
-          lat: 51.505,
+          lat: 51.505 - 0.015, // Start a bit south
           lng: -0.11,
         },
       };
@@ -55,7 +55,7 @@ export const useDriverSimulation = ({ destination }: UseDriverSimulationProps) =
       setDriverInfo(newDriverInfo);
       setDriverMarker({
         position: newDriverInfo.location,
-        title: `${newDriverInfo.name} - ${newDriverInfo.vehicle.model}`
+        title: `${newDriverInfo.name} - Road Assistance`
       });
       setIsLoading(false);
     }, 1500);
@@ -63,7 +63,7 @@ export const useDriverSimulation = ({ destination }: UseDriverSimulationProps) =
     return () => clearTimeout(timer);
   }, []);
 
-  // Simulate driver movement
+  // Simulate driver movement - move faster for road assistance
   useEffect(() => {
     if (isLoading || !driverInfo) return;
 
@@ -72,8 +72,8 @@ export const useDriverSimulation = ({ destination }: UseDriverSimulationProps) =
       setDriverInfo(prev => {
         if (!prev) return prev;
         
-        const newLat = prev.location.lat + (destination.lat - prev.location.lat) * 0.05;
-        const newLng = prev.location.lng + (destination.lng - prev.location.lng) * 0.05;
+        const newLat = prev.location.lat + (destination.lat - prev.location.lat) * 0.08;
+        const newLng = prev.location.lng + (destination.lng - prev.location.lng) * 0.08;
         
         const newLocation = {
           lat: newLat,
@@ -83,17 +83,17 @@ export const useDriverSimulation = ({ destination }: UseDriverSimulationProps) =
         // Update driver marker position for the map
         setDriverMarker({
           position: newLocation,
-          title: `${prev.name} - ${prev.vehicle.model}`
+          title: `${prev.name} - Road Assistance`
         });
         
         return {
           ...prev,
-          eta: Math.max(0, prev.eta - 0.2),
-          distance: Math.max(0, prev.distance - 0.05),
+          eta: Math.max(0, prev.eta - 0.3),
+          distance: Math.max(0, prev.distance - 0.1),
           location: newLocation
         };
       });
-    }, 2000);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, [isLoading, driverInfo, destination]);

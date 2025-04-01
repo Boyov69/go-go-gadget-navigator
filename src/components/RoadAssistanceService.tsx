@@ -14,46 +14,8 @@ const RoadAssistanceService: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   const handleRequestAssistance = () => {
-    setLoading(true);
-    
-    // Get user's current location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          
-          setUserLocation(location);
-          
-          // Simulate API call with a timeout
-          setTimeout(() => {
-            setLoading(false);
-            toast({
-              title: "Road Assistance Requested",
-              description: `Help is on the way to your location! ETA: 25 minutes`,
-              duration: 5000,
-            });
-          }, 1500);
-        },
-        (error) => {
-          setLoading(false);
-          toast({
-            title: "Location Error",
-            description: "Unable to access your location. Please enable location services.",
-            variant: "destructive",
-          });
-        }
-      );
-    } else {
-      setLoading(false);
-      toast({
-        title: "Not Supported",
-        description: "Geolocation is not supported by your browser.",
-        variant: "destructive",
-      });
-    }
+    // Navigate to the dedicated road assistance page
+    navigate("/road-assistance");
   };
 
   const services = [
@@ -90,9 +52,7 @@ const RoadAssistanceService: React.FC = () => {
         <div className="flex items-center gap-2 mb-2 text-sm">
           <MapPin className="h-4 w-4 text-red-500 flex-shrink-0" />
           <span className="text-gray-600">
-            {userLocation 
-              ? `Location detected: ${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` 
-              : "We'll use your current location to send help"}
+            Get assistance at your current location
           </span>
         </div>
         
@@ -106,9 +66,8 @@ const RoadAssistanceService: React.FC = () => {
         <Button
           className="w-full bg-red-500 hover:bg-red-600 text-white"
           onClick={handleRequestAssistance}
-          disabled={loading}
         >
-          {loading ? "Getting Location..." : "Request Assistance Now"}
+          Request Assistance Now
         </Button>
       </CardFooter>
     </Card>

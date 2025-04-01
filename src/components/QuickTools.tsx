@@ -45,7 +45,7 @@ const QuickTools: React.FC = () => {
       icon: AlertTriangle, 
       label: "Road Help", 
       color: "bg-red-100 text-red-700", 
-      to: "/road-assistance"
+      action: () => navigate("/road-assistance")
     },
     { 
       icon: MapPin, 
