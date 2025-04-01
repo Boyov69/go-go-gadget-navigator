@@ -322,7 +322,7 @@ const mockData = {
       scheduledTime: '10:15',
       expectedTime: '10:15',
       platform: '3',
-      status: 'on-time',
+      status: 'on-time' as const,
     },
     {
       id: 'train2',
@@ -331,7 +331,7 @@ const mockData = {
       scheduledTime: '10:25',
       expectedTime: '10:35',
       platform: '4',
-      status: 'delayed',
+      status: 'delayed' as const,
       delayMinutes: 10
     },
     {
@@ -341,7 +341,7 @@ const mockData = {
       scheduledTime: '10:32',
       expectedTime: '10:32',
       platform: '6',
-      status: 'on-time',
+      status: 'on-time' as const,
     },
     {
       id: 'train4',
@@ -350,7 +350,7 @@ const mockData = {
       scheduledTime: '10:45',
       expectedTime: '10:45',
       platform: '8',
-      status: 'cancelled',
+      status: 'cancelled' as const,
     }
   ],
   
@@ -361,7 +361,7 @@ const mockData = {
       destination: 'Delta',
       scheduledTime: '10:05',
       expectedTime: '10:05',
-      status: 'on-time',
+      status: 'on-time' as const,
     },
     {
       id: 'bus2',
@@ -369,7 +369,7 @@ const mockData = {
       destination: 'Sint-Gillis',
       scheduledTime: '10:12',
       expectedTime: '10:17',
-      status: 'delayed',
+      status: 'delayed' as const,
       delayMinutes: 5
     },
     {
@@ -378,7 +378,7 @@ const mockData = {
       destination: 'Brussels Airport',
       scheduledTime: '10:20',
       expectedTime: '10:20',
-      status: 'on-time',
+      status: 'on-time' as const,
     },
     {
       id: 'bus4',
@@ -386,7 +386,7 @@ const mockData = {
       destination: 'Waterloo',
       scheduledTime: '10:35',
       expectedTime: '10:35',
-      status: 'on-time',
+      status: 'on-time' as const,
     }
   ],
   
@@ -395,7 +395,7 @@ const mockData = {
       id: 'route1',
       segments: [
         {
-          type: 'walk',
+          type: 'walk' as const,
           from: {
             name: 'Current Location',
             time: '10:00',
@@ -410,7 +410,7 @@ const mockData = {
           distance: 0.8
         },
         {
-          type: 'train',
+          type: 'train' as const,
           line: 'IC 512',
           from: {
             name: 'Brussels Central',
@@ -433,7 +433,7 @@ const mockData = {
       id: 'route2',
       segments: [
         {
-          type: 'walk',
+          type: 'walk' as const,
           from: {
             name: 'Current Location',
             time: '10:00',
@@ -448,7 +448,7 @@ const mockData = {
           distance: 0.4
         },
         {
-          type: 'metro',
+          type: 'metro' as const,
           line: '1',
           from: {
             name: 'De Brouckère',
@@ -464,7 +464,7 @@ const mockData = {
           duration: 5
         },
         {
-          type: 'bus',
+          type: 'bus' as const,
           line: '71',
           from: {
             name: 'Arts-Loi',
