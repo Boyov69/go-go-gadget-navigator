@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, MapPin, Phone, Tool, Truck, Car, CheckCircle } from "lucide-react";
+import { AlertTriangle, MapPin, Phone, Wrench, Truck, Car, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -65,7 +65,7 @@ const RoadAssistancePage: React.FC = () => {
     { 
       id: "mechanical",
       name: "Mechanical Issue", 
-      icon: Tool,
+      icon: Wrench,
       description: "Engine troubles, battery problems, flat tire, etc." 
     },
     { 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, MapPin, Phone, Tool, Truck } from "lucide-react";
+import { AlertTriangle, MapPin, Phone, Wrench, Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -57,7 +57,7 @@ const RoadAssistanceService: React.FC = () => {
   };
 
   const services = [
-    { icon: Tool, name: "Mechanical" },
+    { icon: Wrench, name: "Mechanical" },
     { icon: Truck, name: "Towing" },
     { icon: AlertTriangle, name: "Emergency" },
   ];
