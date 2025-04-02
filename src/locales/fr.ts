@@ -158,5 +158,15 @@ export const fr = {
     contactSupport: "Contacter le Support",
     connecting: "Connexion aux services d'urgence...",
     supportConnecting: "Connexion au support client..."
+  },
+  vehicle: {
+    car: "Voiture",
+    taxi: "Taxi",
+    shuttle: "Navette",
+    bus: "Bus",
+    bike: "Vélo",
+    e_bike: "Vélo Électrique",
+    scooter: "Trottinette",
+    e_scooter: "Trottinette Électrique"
   }
 };

@@ -145,7 +145,8 @@ export const nl = {
     language: {
       title: "Taalinstellingen",
       description: "Selecteer uw voorkeurstaal.",
-      appLanguage: "Applicatietaal"
+      appLanguage: "Applicatietaal",
+      updatedMessage: "Uw taalinstellingen zijn bijgewerkt"
     },
     saveChanges: "Wijzigingen Opslaan",
     updateProfile: "Profiel Bijwerken",
@@ -158,5 +159,15 @@ export const nl = {
     contactSupport: "Contact Ondersteuning",
     connecting: "Verbinding maken met nooddiensten...",
     supportConnecting: "Verbinding maken met klantenservice..."
+  },
+  vehicle: {
+    car: "Auto",
+    taxi: "Taxi",
+    shuttle: "Shuttle",
+    bus: "Bus",
+    bike: "Fiets",
+    e_bike: "E-Fiets",
+    scooter: "Scooter",
+    e_scooter: "E-Scooter"
   }
 };

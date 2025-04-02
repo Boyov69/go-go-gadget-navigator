@@ -158,5 +158,15 @@ export const es = {
     contactSupport: "Contactar con Soporte",
     connecting: "Conectando con servicios de emergencia...",
     supportConnecting: "Conectando con atención al cliente..."
+  },
+  vehicle: {
+    car: "Coche",
+    taxi: "Taxi",
+    shuttle: "Lanzadera",
+    bus: "Autobús",
+    bike: "Bicicleta",
+    e_bike: "Bicicleta Eléctrica",
+    scooter: "Patinete",
+    e_scooter: "Patinete Eléctrico"
   }
 };

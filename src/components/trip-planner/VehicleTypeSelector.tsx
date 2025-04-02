@@ -1,10 +1,9 @@
+
 import React from 'react';
 import { 
   Car, 
   Truck, 
   Bus, 
-  Train, 
-  Ship, 
   Bike, 
   Zap 
 } from 'lucide-react';
@@ -59,13 +58,13 @@ const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
     {
       id: VehicleCategory.SCOOTER,
       name: t('vehicle.scooter'),
-      icon: <Bike className="h-4 w-4" />
+      icon: <Bike className="h-4 w-4 transform rotate-45" />
     },
     {
       id: VehicleCategory.E_SCOOTER,
       name: t('vehicle.e_scooter'),
       icon: <React.Fragment>
-        <Bike className="h-4 w-4" />
+        <Bike className="h-4 w-4 transform rotate-45" />
         <Zap className="h-3 w-3 absolute -top-1 -right-1 text-yellow-500" />
       </React.Fragment>
     }

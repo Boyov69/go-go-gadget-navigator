@@ -158,5 +158,15 @@ export const de = {
     contactSupport: "Support kontaktieren",
     connecting: "Verbindung zu Notfalldiensten wird hergestellt...",
     supportConnecting: "Verbindung zum Kundensupport wird hergestellt..."
+  },
+  vehicle: {
+    car: "Auto",
+    taxi: "Taxi",
+    shuttle: "Shuttle",
+    bus: "Bus",
+    bike: "Fahrrad",
+    e_bike: "E-Fahrrad",
+    scooter: "Roller",
+    e_scooter: "E-Roller"
   }
 };
