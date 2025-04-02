@@ -1,70 +1,96 @@
 
-import React from "react";
-import { Car, Bus, Plane, Briefcase } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import React from 'react';
+import { 
+  Car, 
+  Truck, 
+  Bus, 
+  Train, 
+  Ship, 
+  Bike, 
+  Scooter, 
+  Zap 
+} from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { VehicleCategory } from '@/types/providerApi';
 
 interface VehicleTypeSelectorProps {
   selectedVehicleType: string;
-  onVehicleTypeChange: (id: string) => void;
+  onVehicleTypeChange: (type: string) => void;
 }
 
 const VehicleTypeSelector: React.FC<VehicleTypeSelectorProps> = ({
   selectedVehicleType,
-  onVehicleTypeChange,
+  onVehicleTypeChange
 }) => {
   const { t } = useLanguage();
 
   const vehicleTypes = [
     {
-      id: "economy",
-      name: t("trip.economy"),
-      icon: <Car className="h-5 w-5" />,
-      description: t("trip.affordableRides"),
-      priceEstimate: "From €8.50",
+      id: VehicleCategory.CAR,
+      name: t('vehicle.car'),
+      icon: <Car className="h-4 w-4" />
     },
     {
-      id: "comfort",
-      name: t("trip.comfort"),
-      icon: <Car className="h-5 w-5" />,
-      description: t("trip.comfortableVehicles"),
-      priceEstimate: "From €12.75",
+      id: VehicleCategory.TAXI,
+      name: t('vehicle.taxi'),
+      icon: <Car className="h-4 w-4" />
     },
     {
-      id: "business",
-      name: t("trip.business"),
-      icon: <Briefcase className="h-5 w-5" />,
-      description: t("trip.premiumVehicles"),
-      priceEstimate: "From €25.00",
+      id: VehicleCategory.SHUTTLE,
+      name: t('vehicle.shuttle'),
+      icon: <Truck className="h-4 w-4" />
     },
     {
-      id: "shuttle",
-      name: t("trip.shuttle"),
-      icon: <Bus className="h-5 w-5" />,
-      description: t("trip.groupVehicles"),
-      priceEstimate: "From €35.00",
+      id: VehicleCategory.BUS,
+      name: t('vehicle.bus'),
+      icon: <Bus className="h-4 w-4" />
     },
+    {
+      id: VehicleCategory.BIKE,
+      name: t('vehicle.bike'),
+      icon: <Bike className="h-4 w-4" />
+    },
+    {
+      id: VehicleCategory.E_BIKE,
+      name: t('vehicle.e_bike'),
+      icon: <React.Fragment>
+        <Bike className="h-4 w-4" />
+        <Zap className="h-3 w-3 absolute -top-1 -right-1 text-yellow-500" />
+      </React.Fragment>
+    },
+    {
+      id: VehicleCategory.SCOOTER,
+      name: t('vehicle.scooter'),
+      icon: <Scooter className="h-4 w-4" />
+    },
+    {
+      id: VehicleCategory.E_SCOOTER,
+      name: t('vehicle.e_scooter'),
+      icon: <React.Fragment>
+        <Scooter className="h-4 w-4" />
+        <Zap className="h-3 w-3 absolute -top-1 -right-1 text-yellow-500" />
+      </React.Fragment>
+    }
   ];
 
   return (
-    <div className="space-y-2">
-      <h4 className="text-sm font-medium">Select Vehicle Type</h4>
-      <div className="grid grid-cols-2 gap-2">
-        {vehicleTypes.map((vehicle) => (
-          <button
-            key={vehicle.id}
-            onClick={() => onVehicleTypeChange(vehicle.id)}
-            className={`p-3 rounded-md border-2 ${
-              selectedVehicleType === vehicle.id
-                ? "bg-primary/10 border-primary"
-                : "bg-accent/50 border-transparent"
-            } flex flex-col items-center justify-center transition-all`}
-          >
-            {vehicle.icon}
-            <span className="text-sm mt-1">{vehicle.name}</span>
-            <span className="text-xs text-muted-foreground mt-1">{vehicle.priceEstimate}</span>
-          </button>
-        ))}
-      </div>
+    <div className="grid grid-cols-4 gap-2">
+      {vehicleTypes.map((type) => (
+        <button
+          key={type.id}
+          onClick={() => onVehicleTypeChange(type.id)}
+          className={`relative p-2 rounded-md flex flex-col items-center justify-center ${
+            selectedVehicleType === type.id
+              ? 'bg-primary/20 border border-primary'
+              : 'bg-accent hover:bg-primary/10 border border-transparent'
+          } transition-all`}
+        >
+          <div className="mb-1 relative">
+            {type.icon}
+          </div>
+          <span className="text-xs font-medium">{type.name}</span>
+        </button>
+      ))}
     </div>
   );
 };
