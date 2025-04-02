@@ -209,5 +209,15 @@ export const en = {
   locations: {
     geolocationError: "Unable to access your location.",
     geolocationNotSupported: "Geolocation is not supported by your browser."
+  },
+  vehicle: {
+    car: "Car",
+    taxi: "Taxi",
+    shuttle: "Shuttle",
+    bus: "Bus",
+    bike: "Bike",
+    e_bike: "E-Bike",
+    scooter: "Scooter", 
+    e_scooter: "E-Scooter"
   }
 };
