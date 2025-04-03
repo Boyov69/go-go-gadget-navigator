@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -28,7 +29,8 @@ import {
   CheckCircle, 
   Wallet, 
   Mic,
-  BarChart2
+  BarChart2,
+  Settings
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AdminGuard from "@/components/guards/AdminGuard";
@@ -37,6 +39,7 @@ import apiService from "@/services/api";
 import { WalletDashboard } from "@/components/admin/WalletDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AIMonitoringService } from "@/services/ai/AIMonitoringService";
+import { Link } from "react-router-dom";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -623,23 +626,45 @@ const SuperAdminDashboard: React.FC = () => {
                 </Card>
               </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle>Daily AI Assistant Interactions</CardTitle>
-                  <CardDescription>Interaction trends over the past week</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={aiAssistantMetrics?.dailyInteractions || []}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="count" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle>Daily AI Assistant Interactions</CardTitle>
+                    <CardDescription>Interaction trends over the past week</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={aiAssistantMetrics?.dailyInteractions || []}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>AI Configuration</CardTitle>
+                    <CardDescription>
+                      Manage settings for the AI Assistant
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Configure AI model settings, behaviors, and permissions for the AI Assistant.
+                    </p>
+                    <Link to="/admin/ai-config">
+                      <Button className="w-full gap-2">
+                        <Settings className="h-4 w-4" />
+                        Configure AI Settings
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </main>

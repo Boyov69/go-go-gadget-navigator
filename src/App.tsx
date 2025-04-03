@@ -19,6 +19,8 @@ import FavoritesPage from "./pages/Favorites";
 import AdminDashboard from "./pages/AdminDashboard";
 import RoadAssistancePage from "./pages/RoadAssistance";
 import PublicTransportPage from "./pages/PublicTransport";
+import AIConfiguratorPage from "./pages/AIConfigurator";
+import AIAssistantAdminPage from "./pages/AIAssistantAdmin";
 
 // Removed the duplicate QueryClient since it's already in main.tsx
 const App = () => (
@@ -50,6 +52,14 @@ const App = () => (
               <AdminDashboard />
             </AdminGuard>
           } 
+        />
+        <Route 
+          path="/admin/ai-assistant" 
+          element={<AIAssistantAdminPage />} 
+        />
+        <Route 
+          path="/admin/ai-config" 
+          element={<AIConfiguratorPage />} 
         />
 
         {/* Super Admin routes */}

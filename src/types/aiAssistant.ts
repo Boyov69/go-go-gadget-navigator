@@ -35,3 +35,17 @@ export interface AIAssistantMonitoringState {
   isLoading: boolean;
   error: string | null;
 }
+
+export interface AIAssistantConfig {
+  enabled: boolean;
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  enableLogs: boolean;
+  enableVoice: boolean;
+  enableSuggestions: boolean;
+  responseTone: "professional" | "friendly" | "concise";
+  allowedCommands: string[];
+  apiThrottleLimit: number;
+  defaultPrompt: string;
+}
