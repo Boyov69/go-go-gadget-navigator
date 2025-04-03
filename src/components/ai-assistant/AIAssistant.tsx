@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VoiceAssistant from './VoiceAssistant';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
+import { AIMonitoringService } from '@/services/ai/AIMonitoringService';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -21,6 +22,13 @@ const AIAssistant: React.FC = () => {
     try {
       const result = await AICommandProcessor.processCommand(command);
       setResponse(result);
+      
+      // Speak the response (optional text-to-speech)
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(result);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+      }
     } catch (error) {
       console.error('Error processing AI command:', error);
       toast({
@@ -30,6 +38,31 @@ const AIAssistant: React.FC = () => {
       });
     }
   };
+  
+  // Stop speech synthesis when drawer closes
+  useEffect(() => {
+    if (!isOpen && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }, [isOpen]);
+  
+  // Accessibility enhancement: keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Alt+A to toggle AI Assistant
+      if (e.altKey && e.key === 'a') {
+        setIsOpen(prev => !prev);
+      }
+      
+      // Escape to close if open
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isOpen]);
 
   return (
     <>
@@ -39,6 +72,8 @@ const AIAssistant: React.FC = () => {
           <Button 
             className="fixed bottom-24 right-6 rounded-full shadow-lg size-14 z-50"
             variant="default"
+            aria-label="Open AI Assistant"
+            title="Open AI Assistant (Alt+A)"
           >
             <RocketIcon className="size-6" />
           </Button>
@@ -48,7 +83,7 @@ const AIAssistant: React.FC = () => {
           <DrawerHeader>
             <DrawerTitle className="text-xl flex items-center justify-between">
               <span>AI Navigation Assistant</span>
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
+              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} aria-label="Close">
                 <X className="size-4" />
               </Button>
             </DrawerTitle>

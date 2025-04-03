@@ -11,7 +11,8 @@ export const AIAssistantRoadmap = {
     "Voice command recognition and processing",
     "Basic natural language understanding for navigation commands",
     "Contextual responses based on command type",
-    "Accessible user interface with voice feedback"
+    "Accessible user interface with voice feedback",
+    "Admin monitoring dashboard for AI Assistant usage"
   ],
   
   plannedFeatures: {
@@ -25,8 +26,8 @@ export const AIAssistantRoadmap = {
     midTerm: [
       "Video input processing for gesture recognition",
       "Integration with the map system for visual cues",
-      "Admin dashboard for monitoring AI interactions and performance",
-      "Context-aware suggestions based on user location and history"
+      "Context-aware suggestions based on user location and history",
+      "Advanced analytics and performance metrics for admin dashboard"
     ],
     
     longTerm: [
@@ -48,6 +49,21 @@ export const AIAssistantRoadmap = {
       "LLM Service - Advanced language understanding",
       "AR Service - For augmented reality features",
       "Vision Analysis Service - For video input processing"
+    ]
+  },
+  
+  adminFeatures: {
+    current: [
+      "AI Assistant usage monitoring dashboard",
+      "Interaction logs with command details",
+      "Basic metrics and analytics",
+      "Command type distribution visualization"
+    ],
+    planned: [
+      "Real-time monitoring of AI Assistant performance",
+      "Advanced analytics with user session tracking",
+      "Error rate analysis and troubleshooting tools",
+      "Custom reports and data export capabilities"
     ]
   }
 };

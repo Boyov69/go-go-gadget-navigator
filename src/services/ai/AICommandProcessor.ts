@@ -1,5 +1,6 @@
 
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AIMonitoringService } from "./AIMonitoringService";
 
 // Define the supported command types
 export enum CommandType {
@@ -45,27 +46,63 @@ export const AICommandProcessor = {
    * Process a voice command and determine the appropriate action
    */
   processCommand: async (command: string): Promise<string> => {
+    const startTime = performance.now();
     const commandType = detectCommandType(command);
     const commandDetails = extractCommandDetails(command, commandType);
     
-    // Here we could connect to a more sophisticated NLU service
-    // For now, we'll use a basic pattern-matching approach
-    
-    switch (commandType) {
-      case CommandType.NAVIGATION:
-        return handleNavigationCommand(commandDetails);
+    try {
+      // Here we could connect to a more sophisticated NLU service
+      // For now, we'll use a basic pattern-matching approach
       
-      case CommandType.SEARCH:
-        return handleSearchCommand(commandDetails);
+      let response: string;
       
-      case CommandType.SETTINGS:
-        return handleSettingsCommand(commandDetails);
+      switch (commandType) {
+        case CommandType.NAVIGATION:
+          response = handleNavigationCommand(commandDetails);
+          break;
+        
+        case CommandType.SEARCH:
+          response = handleSearchCommand(commandDetails);
+          break;
+        
+        case CommandType.SETTINGS:
+          response = handleSettingsCommand(commandDetails);
+          break;
+        
+        case CommandType.HELP:
+          response = handleHelpCommand(commandDetails);
+          break;
+        
+        default:
+          response = "I'm not sure how to help with that. Try asking for directions, searching for something, or changing settings.";
+      }
       
-      case CommandType.HELP:
-        return handleHelpCommand(commandDetails);
+      // Log the successful interaction
+      const processingTime = Math.round(performance.now() - startTime);
+      AIMonitoringService.logInteraction(
+        command,
+        response,
+        commandType,
+        processingTime,
+        true
+      );
       
-      default:
-        return "I'm not sure how to help with that. Try asking for directions, searching for something, or changing settings.";
+      return response;
+    } catch (error) {
+      // Log the failed interaction
+      const processingTime = Math.round(performance.now() - startTime);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      AIMonitoringService.logInteraction(
+        command,
+        "Sorry, I encountered an error processing your request.",
+        commandType,
+        processingTime,
+        false,
+        errorMessage
+      );
+      
+      throw error;
     }
   }
 };
