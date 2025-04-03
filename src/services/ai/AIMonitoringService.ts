@@ -1,4 +1,3 @@
-
 import { AIAssistantLog, AIAssistantMetrics } from "@/types/aiAssistant";
 import { CommandType } from "./AICommandProcessor";
 
@@ -85,7 +84,7 @@ export class AIMonitoringService {
     const startDate = new Date();
     startDate.setDate(now.getDate() - timeframeInDays);
     
-    const relevantLogs = this.logs.filter(log => log.timestamp >= startDate);
+    const relevantLogs = this.getLogs().filter(log => log.timestamp >= startDate);
     
     // Basic metrics
     const totalInteractions = relevantLogs.length;

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
@@ -19,17 +18,28 @@ import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCcw, Users, Building2, Activity, Server, AlertTriangle, CheckCircle, Wallet } from "lucide-react";
+import { 
+  RefreshCcw, 
+  Users, 
+  Building2, 
+  Activity, 
+  Server, 
+  AlertTriangle, 
+  CheckCircle, 
+  Wallet, 
+  Mic,
+  BarChart2
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import AdminGuard from "@/components/guards/AdminGuard";
 import { UserRole } from "@/services/auth";
 import apiService from "@/services/api";
 import { WalletDashboard } from "@/components/admin/WalletDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AIMonitoringService } from "@/services/ai/AIMonitoringService";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-// Mock data for when API fails or during development
 const mockDashboardData = {
   stats: {
     totalUsers: 1250,
@@ -64,7 +74,6 @@ const mockDashboardData = {
   ]
 };
 
-// Types for our dashboard data
 interface DashboardData {
   stats: {
     totalUsers: number;
@@ -113,7 +122,6 @@ const SuperAdminDashboard: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
   
-  // Fetch dashboard stats with React Query
   const { data: statsData, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
     queryKey: ['dashboardStats'],
     queryFn: async () => {
@@ -127,7 +135,6 @@ const SuperAdminDashboard: React.FC = () => {
     },
   });
   
-  // Fetch users with React Query
   const { data: usersData, isLoading: usersLoading, error: usersError, refetch: refetchUsers } = useQuery({
     queryKey: ['adminUsers'],
     queryFn: async () => {
@@ -141,7 +148,6 @@ const SuperAdminDashboard: React.FC = () => {
     },
   });
   
-  // Fetch providers with React Query
   const { data: providersData, isLoading: providersLoading, error: providersError, refetch: refetchProviders } = useQuery({
     queryKey: ['adminProviders'],
     queryFn: async () => {
@@ -155,7 +161,13 @@ const SuperAdminDashboard: React.FC = () => {
     },
   });
 
-  // Use the stats, users, and providers data
+  const { data: aiAssistantMetrics, isLoading: aiMetricsLoading, error: aiMetricsError } = useQuery({
+    queryKey: ['aiAssistantMetrics'],
+    queryFn: () => {
+      return AIMonitoringService.getMetrics();
+    }
+  });
+
   const dashboardData: DashboardData = {
     stats: statsData?.stats || mockDashboardData.stats,
     users: usersData || mockDashboardData.users,
@@ -179,7 +191,6 @@ const SuperAdminDashboard: React.FC = () => {
     { name: "Inactive", value: dashboardData.stats.inactiveUsers }
   ];
 
-  // Handle loading state
   if (statsLoading || usersLoading || providersLoading) {
     return (
       <div className="flex min-h-screen bg-background">
@@ -202,7 +213,6 @@ const SuperAdminDashboard: React.FC = () => {
     );
   }
 
-  // Handle error state
   if (statsError || usersError || providersError) {
     return (
       <div className="flex min-h-screen bg-background">
@@ -257,12 +267,14 @@ const SuperAdminDashboard: React.FC = () => {
                 <Wallet className="h-4 w-4" />
                 Provider Wallets
               </TabsTrigger>
+              <TabsTrigger value="ai-assistant" className="flex items-center gap-1">
+                <Mic className="h-4 w-4" />
+                AI Assistant
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview">
-              {/* Overview Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                {/* Users Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -279,7 +291,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Providers Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Active Providers</CardTitle>
@@ -296,7 +307,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* System Status Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">System Status</CardTitle>
@@ -318,7 +328,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Server Load Card */}
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">Server Load</CardTitle>
@@ -341,9 +350,7 @@ const SuperAdminDashboard: React.FC = () => {
                 </Card>
               </div>
               
-              {/* Main Content */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Users Overview */}
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle>User Analytics</CardTitle>
@@ -387,7 +394,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardFooter>
                 </Card>
                 
-                {/* Recent Users */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Recent Users</CardTitle>
@@ -416,7 +422,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardFooter>
                 </Card>
                 
-                {/* System Resources */}
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle>System Resources</CardTitle>
@@ -461,7 +466,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Recent Events */}
                 <Card>
                   <CardHeader>
                     <CardTitle>System Events</CardTitle>
@@ -490,7 +494,6 @@ const SuperAdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
                 
-                {/* Providers Table */}
                 <Card className="lg:col-span-3">
                   <CardHeader>
                     <CardTitle>Service Providers</CardTitle>
@@ -543,6 +546,100 @@ const SuperAdminDashboard: React.FC = () => {
             
             <TabsContent value="wallets">
               <WalletDashboard />
+            </TabsContent>
+            
+            <TabsContent value="ai-assistant">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">Total Interactions</CardTitle>
+                    <Mic className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{aiAssistantMetrics?.totalInteractions || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      AI Assistant usage
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">Successful Interactions</CardTitle>
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{aiAssistantMetrics?.successfulInteractions || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      <span className="text-green-500">
+                        {aiAssistantMetrics 
+                          ? `${((aiAssistantMetrics.successfulInteractions / aiAssistantMetrics.totalInteractions) * 100).toFixed(1)}%` 
+                          : '0%'
+                        }
+                      </span>{" "}
+                      success rate
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">Avg. Processing Time</CardTitle>
+                    <BarChart2 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{aiAssistantMetrics?.averageProcessingTimeMs || 0} ms</div>
+                    <p className="text-xs text-muted-foreground">
+                      Average response time
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">Command Distribution</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent className="h-36">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={Object.entries(aiAssistantMetrics?.commandTypeDistribution || {}).map(([name, value]) => ({ name, value }))}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={50}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {Object.keys(aiAssistantMetrics?.commandTypeDistribution || {}).map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Daily AI Assistant Interactions</CardTitle>
+                  <CardDescription>Interaction trends over the past week</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={aiAssistantMetrics?.dailyInteractions || []}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </main>
