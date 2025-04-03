@@ -47,7 +47,8 @@ export const WalletTransactionHandler: React.FC<WalletTransactionHandlerProps> =
         );
         toast({
           title: "Deposit successful",
-          description: `Added ${transactionAmount} ${transactionCurrency} to ${selectedWallet.providerName}'s wallet.`
+          description: `Added ${transactionAmount} ${transactionCurrency} to ${selectedWallet.providerName}'s wallet.`,
+          role: "status", // Add ARIA role for screen readers
         });
       } else {
         await walletService.withdrawFunds(
@@ -57,7 +58,8 @@ export const WalletTransactionHandler: React.FC<WalletTransactionHandlerProps> =
         );
         toast({
           title: "Withdrawal initiated",
-          description: `Withdrawal of ${transactionAmount} ${transactionCurrency} from ${selectedWallet.providerName}'s wallet is pending.`
+          description: `Withdrawal of ${transactionAmount} ${transactionCurrency} from ${selectedWallet.providerName}'s wallet is pending.`,
+          role: "status", // Add ARIA role for screen readers
         });
       }
 
@@ -70,7 +72,8 @@ export const WalletTransactionHandler: React.FC<WalletTransactionHandlerProps> =
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
+        role: "alert", // Add ARIA role for screen readers
       });
     }
   };

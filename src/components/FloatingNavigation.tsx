@@ -91,10 +91,14 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
   return (
     <>
       {/* Desktop navigation - side floating panel */}
-      <div className={cn(
-        "fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col",
-        className
-      )}>
+      <div 
+        className={cn(
+          "fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col",
+          className
+        )}
+        role="navigation"
+        aria-label="Quick navigation"
+      >
         <div className="bg-background/95 backdrop-blur-sm shadow-lg rounded-lg border p-2 space-y-2">
           {navItems.map((item) => (
             <Button
@@ -103,9 +107,13 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
               size="icon"
               onClick={item.action}
               title={item.label}
+              aria-label={item.label}
               className="rounded-full h-10 w-10 flex items-center justify-center"
             >
-              {item.icon}
+              {React.isValidElement(item.icon) ? 
+                React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                item.icon
+              }
               <span className="sr-only">{item.label}</span>
             </Button>
           ))}
@@ -113,7 +121,11 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
       </div>
       
       {/* Mobile navigation - bottom bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t shadow-lg">
+      <div 
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-t shadow-lg"
+        role="navigation"
+        aria-label="Mobile navigation"
+      >
         <Drawer>
           <div className="grid grid-cols-5 h-16">
             {/* Show first 4 most important navigation items */}
@@ -123,8 +135,12 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
                 variant="ghost"
                 onClick={item.action}
                 className="h-full rounded-none flex flex-col gap-1 items-center justify-center"
+                aria-label={item.label}
               >
-                {item.icon}
+                {React.isValidElement(item.icon) ? 
+                  React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                  item.icon
+                }
                 <span className="text-xs">{item.label}</span>
               </Button>
             ))}
@@ -134,6 +150,8 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
               <Button 
                 variant="ghost" 
                 className="h-full rounded-none flex flex-col gap-1 items-center justify-center"
+                aria-label="Show more navigation options"
+                aria-haspopup="dialog"
               >
                 <svg
                   width="16"
@@ -141,6 +159,7 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <circle cx="2" cy="8" r="2" fill="currentColor" />
                   <circle cx="8" cy="8" r="2" fill="currentColor" />
@@ -151,18 +170,23 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
             </DrawerTrigger>
           </div>
           
-          <DrawerContent className="max-h-[50vh]">
+          <DrawerContent className="max-h-[50vh]" role="dialog" aria-label="Navigation options">
             <ScrollArea className="h-full max-h-[calc(50vh-2rem)] p-4">
-              <div className="grid grid-cols-4 gap-4 p-4">
+              <div className="grid grid-cols-4 gap-4 p-4" role="menu">
                 {navItems.map((item) => (
                   <Button
                     key={item.value}
                     variant="ghost"
                     onClick={item.action}
                     className="flex flex-col gap-2 h-auto py-4 items-center justify-center"
+                    role="menuitem"
+                    aria-label={item.label}
                   >
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      {item.icon}
+                      {React.isValidElement(item.icon) ? 
+                        React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                        item.icon
+                      }
                     </div>
                     <span className="text-xs font-medium">{item.label}</span>
                   </Button>
