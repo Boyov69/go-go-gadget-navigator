@@ -36,9 +36,24 @@ export interface AIAssistantMonitoringState {
   error: string | null;
 }
 
+export type AIModelType = 
+  | "gpt-4o-mini" 
+  | "gpt-4o" 
+  | "gpt-4.5-preview" 
+  | "claude-3-opus" 
+  | "claude-3-sonnet" 
+  | "claude-3-haiku" 
+  | "llama-3-70b" 
+  | "llama-3-8b" 
+  | "gemini-pro" 
+  | "gemini-ultra" 
+  | "mistral-large" 
+  | "mistral-medium" 
+  | "mixtral-8x7b";
+
 export interface AIAssistantConfig {
   enabled: boolean;
-  model: string;
+  model: AIModelType;
   temperature: number;
   maxTokens: number;
   enableLogs: boolean;

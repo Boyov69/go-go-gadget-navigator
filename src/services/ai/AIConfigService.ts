@@ -1,5 +1,5 @@
 
-import { AIAssistantConfig } from "@/types/aiAssistant";
+import { AIAssistantConfig, AIModelType } from "@/types/aiAssistant";
 
 /**
  * Service for managing AI Assistant configuration
@@ -62,5 +62,26 @@ export class AIConfigService {
   static resetConfig(): AIAssistantConfig {
     localStorage.removeItem(this.CONFIG_KEY);
     return { ...this.DEFAULT_CONFIG };
+  }
+
+  /**
+   * Get all available AI models
+   */
+  static getAvailableModels(): {id: AIModelType; name: string; provider: string}[] {
+    return [
+      { id: "gpt-4o-mini", name: "GPT-4o Mini", provider: "OpenAI" },
+      { id: "gpt-4o", name: "GPT-4o", provider: "OpenAI" },
+      { id: "gpt-4.5-preview", name: "GPT-4.5 Preview", provider: "OpenAI" },
+      { id: "claude-3-opus", name: "Claude 3 Opus", provider: "Anthropic" },
+      { id: "claude-3-sonnet", name: "Claude 3 Sonnet", provider: "Anthropic" },
+      { id: "claude-3-haiku", name: "Claude 3 Haiku", provider: "Anthropic" },
+      { id: "llama-3-70b", name: "Llama 3 (70B)", provider: "Meta" },
+      { id: "llama-3-8b", name: "Llama 3 (8B)", provider: "Meta" },
+      { id: "gemini-pro", name: "Gemini Pro", provider: "Google" },
+      { id: "gemini-ultra", name: "Gemini Ultra", provider: "Google" },
+      { id: "mistral-large", name: "Mistral Large", provider: "Mistral AI" },
+      { id: "mistral-medium", name: "Mistral Medium", provider: "Mistral AI" },
+      { id: "mixtral-8x7b", name: "Mixtral 8x7B", provider: "Mistral AI" }
+    ];
   }
 }

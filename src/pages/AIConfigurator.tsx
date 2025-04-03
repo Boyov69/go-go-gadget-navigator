@@ -71,6 +71,9 @@ const AIConfigurator: React.FC = () => {
     });
   };
 
+  // Get all available models
+  const availableModels = AIConfigService.getAvailableModels();
+
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
@@ -200,10 +203,17 @@ const AIConfigurator: React.FC = () => {
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select an AI model" />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
-                                  <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-                                  <SelectItem value="gpt-4.5-preview">GPT-4.5 Preview</SelectItem>
+                                <SelectContent className="max-h-[300px]">
+                                  {availableModels.map((model) => (
+                                    <SelectItem key={model.id} value={model.id}>
+                                      <div className="flex flex-col">
+                                        <span>{model.name}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {model.provider}
+                                        </span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </FormControl>
