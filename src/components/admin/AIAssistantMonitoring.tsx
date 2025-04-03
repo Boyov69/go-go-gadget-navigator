@@ -29,6 +29,7 @@ const AIAssistantMonitoring: React.FC = () => {
   }, [timeframe]);
   
   const loadData = () => {
+    // Use refactored AIMonitoringService which internally uses specialized services
     const allLogs = AIMonitoringService.getLogs();
     setLogs(allLogs);
     
