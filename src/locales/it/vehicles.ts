@@ -5,7 +5,7 @@ export const vehicles = {
   shuttle: "Navetta",
   bus: "Autobus",
   bike: "Bicicletta",
-  e_bike: "Bici Elettrica",
+  e_bike: "E-Bicicletta",
   scooter: "Scooter", 
-  e_scooter: "Scooter Elettrico"
+  e_scooter: "E-Scooter"
 };
