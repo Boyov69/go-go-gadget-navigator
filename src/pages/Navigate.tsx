@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Navigation2, Search, Compass, LocateFixed, History } from "lucide-react";
+import AIAssistant from "@/components/ai-assistant/AIAssistant";
 
 const NavigatePage: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -108,6 +109,8 @@ const NavigatePage: React.FC = () => {
             </div>
           </div>
         </main>
+        
+        <AIAssistant />
       </div>
     </div>
   );

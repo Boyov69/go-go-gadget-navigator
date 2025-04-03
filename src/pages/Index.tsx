@@ -9,6 +9,7 @@ import UserLoginSection from "@/components/dashboard/UserLoginSection";
 import LeftSidebar from "@/components/dashboard/LeftSidebar";
 import MainContent from "@/components/dashboard/MainContent";
 import RightSidebar from "@/components/dashboard/RightSidebar";
+import AIAssistant from "@/components/ai-assistant/AIAssistant";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -79,6 +80,7 @@ const Index: React.FC = () => {
         </main>
         
         <EmergencyButton />
+        <AIAssistant />
       </div>
     </div>
   );
