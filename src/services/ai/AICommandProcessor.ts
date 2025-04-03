@@ -8,6 +8,9 @@ export enum CommandType {
   SEARCH = 'search',
   SETTINGS = 'settings',
   HELP = 'help',
+  TAB_CONTROL = 'tab_control',
+  APP_NAVIGATION = 'app_navigation',
+  WEB_NAVIGATION = 'web_navigation',
   UNKNOWN = 'unknown'
 }
 
@@ -38,7 +41,69 @@ const commandPatterns = {
     /how (do|can) I (.+)/i,
     /what can you do/i,
     /show me how to (.+)/i
+  ],
+  tab_control: [
+    /open (.*) tab/i,
+    /switch to (.*) tab/i,
+    /show (.*) tab/i,
+    /select (.*) tab/i,
+    /go to (.*) tab/i,
+  ],
+  app_navigation: [
+    /open (.*) page/i,
+    /navigate to (.*) page/i,
+    /show me (.*) page/i,
+    /go to (.*) page/i,
+    /take me to (.*) page/i
+  ],
+  web_navigation: [
+    /search (the web|online) for (.+)/i,
+    /look up (.+) online/i,
+    /find information about (.+)/i,
+    /search google for (.+)/i,
+    /check (.*) website/i,
+    /open website (.+)/i
   ]
+};
+
+// Page mapping for navigation
+const pageMapping: Record<string, string> = {
+  home: "/",
+  index: "/",
+  main: "/",
+  explore: "/explore",
+  navigation: "/navigate",
+  navigate: "/navigate",
+  public: "/public-transport",
+  "public transport": "/public-transport",
+  trains: "/public-transport",
+  transport: "/public-transport",
+  cargo: "/cargo",
+  settings: "/settings",
+  "saved trips": "/saved-trips",
+  favorites: "/favorites",
+  suppliers: "/suppliers",
+  providers: "/suppliers",
+  admin: "/admin/dashboard",
+  "admin dashboard": "/admin/dashboard",
+  "super admin": "/super-admin/dashboard",
+  "super admin dashboard": "/super-admin/dashboard"
+};
+
+// Tab mapping for public transport
+const tabMapping: Record<string, string> = {
+  routes: "routes",
+  train: "train",
+  trains: "train",
+  bus: "bus",
+  buses: "bus",
+  tram: "tram-metro",
+  metro: "tram-metro",
+  subway: "tram-metro",
+  "tram metro": "tram-metro",
+  nearby: "nearby",
+  stations: "nearby",
+  "nearby stations": "nearby"
 };
 
 export const AICommandProcessor = {
@@ -71,6 +136,18 @@ export const AICommandProcessor = {
         
         case CommandType.HELP:
           response = handleHelpCommand(commandDetails);
+          break;
+          
+        case CommandType.TAB_CONTROL:
+          response = await handleTabControlCommand(commandDetails);
+          break;
+          
+        case CommandType.APP_NAVIGATION:
+          response = await handleAppNavigationCommand(commandDetails);
+          break;
+          
+        case CommandType.WEB_NAVIGATION:
+          response = await handleWebNavigationCommand(commandDetails);
           break;
         
         default:
@@ -111,6 +188,27 @@ export const AICommandProcessor = {
  * Detect the type of command based on keywords and patterns
  */
 function detectCommandType(command: string): CommandType {
+  // Check tab control patterns first (higher priority)
+  for (const pattern of commandPatterns.tab_control) {
+    if (pattern.test(command)) {
+      return CommandType.TAB_CONTROL;
+    }
+  }
+  
+  // Check app navigation patterns
+  for (const pattern of commandPatterns.app_navigation) {
+    if (pattern.test(command)) {
+      return CommandType.APP_NAVIGATION;
+    }
+  }
+  
+  // Check web navigation patterns
+  for (const pattern of commandPatterns.web_navigation) {
+    if (pattern.test(command)) {
+      return CommandType.WEB_NAVIGATION;
+    }
+  }
+  
   // Check navigation patterns
   for (const pattern of commandPatterns.navigation) {
     if (pattern.test(command)) {
@@ -164,6 +262,34 @@ function extractCommandDetails(command: string, type: CommandType): string {
         }
       }
       break;
+      
+    case CommandType.TAB_CONTROL:
+      for (const pattern of commandPatterns.tab_control) {
+        const match = command.match(pattern);
+        if (match && match.length > 1) {
+          return match[1].toLowerCase().trim(); // Tab name
+        }
+      }
+      break;
+      
+    case CommandType.APP_NAVIGATION:
+      for (const pattern of commandPatterns.app_navigation) {
+        const match = command.match(pattern);
+        if (match && match.length > 1) {
+          return match[1].toLowerCase().trim(); // Page name
+        }
+      }
+      break;
+      
+    case CommandType.WEB_NAVIGATION:
+      for (const pattern of commandPatterns.web_navigation) {
+        const match = command.match(pattern);
+        if (match && match.length > 1) {
+          // Return the search term or website
+          return match[match.length - 1].toLowerCase().trim();
+        }
+      }
+      break;
   }
   
   return command; // Return the full command if no details extracted
@@ -199,4 +325,68 @@ function handleSettingsCommand(details: string): string {
  */
 function handleHelpCommand(details: string): string {
   return `I can help you navigate, search for places, or change settings. Try saying "navigate to the airport" or "search for restaurants nearby".`;
+}
+
+/**
+ * Handle tab control commands
+ */
+async function handleTabControlCommand(tabName: string): Promise<string> {
+  // Normalize tab name input
+  const normalizedTabName = tabName.toLowerCase().trim();
+  
+  // Check if we're on the public transport page
+  const currentPath = window.location.pathname;
+  if (currentPath === "/public-transport" || currentPath.includes("/public-transport")) {
+    // Try to find the tab
+    const targetTab = tabMapping[normalizedTabName];
+    
+    if (targetTab) {
+      // Find tab element and click it
+      const tabElement = document.querySelector(`[value="${targetTab}"]`) as HTMLElement;
+      if (tabElement) {
+        tabElement.click();
+        return `Switched to the ${normalizedTabName} tab.`;
+      }
+    }
+  }
+  
+  // If not on the right page or tab not found
+  if (pageMapping["public-transport"]) {
+    // Navigate to public transport page
+    window.location.href = pageMapping["public-transport"];
+    return `Navigating to public transport page to show ${normalizedTabName} tab.`;
+  }
+  
+  return `I couldn't find the ${normalizedTabName} tab. Please try again with a valid tab name.`;
+}
+
+/**
+ * Handle app navigation commands
+ */
+async function handleAppNavigationCommand(pageName: string): Promise<string> {
+  // Normalize page name input
+  const normalizedPageName = pageName.toLowerCase().trim();
+  
+  // Check if page exists in our mapping
+  const targetPath = pageMapping[normalizedPageName];
+  
+  if (targetPath) {
+    // Navigate to the page
+    window.location.href = targetPath;
+    return `Navigating to ${pageName} page.`;
+  }
+  
+  return `I couldn't find a page called "${pageName}". Please try again with a valid page name.`;
+}
+
+/**
+ * Handle web navigation commands
+ */
+async function handleWebNavigationCommand(searchTerm: string): Promise<string> {
+  // For security, we'll only do Google searches rather than arbitrary website navigation
+  // This opens a new tab with a Google search
+  const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`;
+  window.open(searchUrl, '_blank');
+  
+  return `I've opened a search for "${searchTerm}" in a new tab.`;
 }

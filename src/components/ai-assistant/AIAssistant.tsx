@@ -6,18 +6,22 @@ import { AIMonitoringService } from '@/services/ai/AIMonitoringService';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { RocketIcon, Mic, X } from 'lucide-react';
+import { RocketIcon, Mic, X, Compass } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 const AIAssistant: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [latestCommand, setLatestCommand] = useState<string>('');
   const [response, setResponse] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const handleCommandProcessed = async (command: string) => {
     setLatestCommand(command);
+    setIsProcessing(true);
     
     try {
       const result = await AICommandProcessor.processCommand(command);
@@ -36,6 +40,8 @@ const AIAssistant: React.FC = () => {
         description: "Sorry, I couldn't process that request.",
         variant: "destructive"
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
   
@@ -114,18 +120,36 @@ const AIAssistant: React.FC = () => {
               </Card>
             )}
             
-            <div className="flex flex-col items-center mt-6">
-              <Button
-                className={`rounded-full size-16 flex items-center justify-center ${isListening ? 'bg-red-500 hover:bg-red-600' : ''}`}
-                onClick={() => setIsListening(!isListening)}
-                aria-label={isListening ? "Stop listening" : "Start listening"}
-              >
-                <Mic className="size-6" />
-              </Button>
-              <p className="text-sm text-muted-foreground mt-2">
-                {isListening ? "Listening..." : "Tap to speak"}
-              </p>
+            <div className="mt-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 flex flex-col items-center">
+                  <Button
+                    className={`rounded-full size-16 flex items-center justify-center ${isListening ? 'bg-red-500 hover:bg-red-600' : ''} ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => setIsListening(!isListening)}
+                    aria-label={isListening ? "Stop listening" : "Start listening"}
+                    disabled={isProcessing}
+                  >
+                    <Mic className="size-6" />
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {isListening ? "Listening..." : "Tap to speak"}
+                  </p>
+                </div>
+              </div>
             </div>
+            
+            <Card className="border-dashed">
+              <CardContent className="pt-4">
+                <h4 className="text-sm font-semibold mb-2">Try saying:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>"Open public transport page"</li>
+                  <li>"Switch to train tab"</li>
+                  <li>"Go to settings"</li>
+                  <li>"Search online for train schedules"</li>
+                  <li>"Navigate to Brussels"</li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </DrawerContent>
       </Drawer>

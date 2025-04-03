@@ -66,6 +66,16 @@ export interface TransportAPIConfig {
   endpoint?: string;
 }
 
+export interface AINavigationCapabilities {
+  appNavigation: boolean;
+  tabControl: boolean;
+  webSearch: boolean;
+  externalNavigation: boolean;
+  allowedDomains?: string[];
+  restrictedDomains?: string[];
+  requireConfirmation: boolean;
+}
+
 export interface AIAssistantConfig {
   enabled: boolean;
   model: AIModelType;
@@ -80,4 +90,5 @@ export interface AIAssistantConfig {
   defaultPrompt: string;
   providers: Record<AIProviderType, AIProviderConfig>;
   transportApis?: Record<string, TransportAPIConfig>;
+  navigation?: AINavigationCapabilities;
 }

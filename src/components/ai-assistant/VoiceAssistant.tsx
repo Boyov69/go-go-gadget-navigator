@@ -1,7 +1,8 @@
 
-import React, { useEffect, useRef } from 'react';
-import { AlertCircle } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AlertCircle, Mic, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
 
 interface VoiceAssistantProps {
   isListening: boolean;
@@ -15,7 +16,58 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
   onCommandProcessed 
 }) => {
   const recognitionRef = useRef<any>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [volume, setVolume] = useState(0);
+  
+  // Audio visualization
+  useEffect(() => {
+    let audioContext: AudioContext | null = null;
+    let analyser: AnalyserNode | null = null;
+    let microphone: MediaStreamAudioSourceNode | null = null;
+    let dataArray: Uint8Array | null = null;
+    let animationFrame: number | null = null;
+    
+    const setupAudioVisualization = async () => {
+      if (!isListening) return;
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new AudioContext();
+        analyser = audioContext.createAnalyser();
+        microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        
+        const updateVolume = () => {
+          if (!isListening || !analyser || !dataArray) return;
+          
+          analyser.getByteFrequencyData(dataArray);
+          const average = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+          const normalizedVolume = Math.min(100, average * 2); // Scale for better visual
+          setVolume(normalizedVolume);
+          
+          animationFrame = requestAnimationFrame(updateVolume);
+        };
+        
+        updateVolume();
+      } catch (err) {
+        console.error("Error setting up audio visualization:", err);
+      }
+    };
+    
+    if (isListening) {
+      setupAudioVisualization();
+    }
+    
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      if (microphone) microphone.disconnect();
+      if (audioContext) audioContext.close();
+    };
+  }, [isListening]);
   
   useEffect(() => {
     // Initialize speech recognition
@@ -91,6 +143,15 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+      
+      {isListening && (
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center justify-center w-8 h-8">
+            <Volume2 className={`h-6 w-6 animate-pulse text-primary`} />
+          </div>
+          <Progress value={volume} className="w-full h-2" />
+        </div>
       )}
     </>
   );
