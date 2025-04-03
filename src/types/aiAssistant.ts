@@ -60,6 +60,12 @@ export interface AIProviderConfig {
   endpoint?: string;
 }
 
+export interface TransportAPIConfig {
+  enabled: boolean;
+  apiKey: string;
+  endpoint?: string;
+}
+
 export interface AIAssistantConfig {
   enabled: boolean;
   model: AIModelType;
@@ -73,4 +79,5 @@ export interface AIAssistantConfig {
   apiThrottleLimit: number;
   defaultPrompt: string;
   providers: Record<AIProviderType, AIProviderConfig>;
+  transportApis?: Record<string, TransportAPIConfig>;
 }

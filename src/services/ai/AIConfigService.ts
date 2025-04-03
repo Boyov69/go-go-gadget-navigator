@@ -1,4 +1,3 @@
-
 import { AIAssistantConfig, AIModelType, AIProviderType } from "@/types/aiAssistant";
 
 /**
@@ -7,6 +6,7 @@ import { AIAssistantConfig, AIModelType, AIProviderType } from "@/types/aiAssist
 export class AIConfigService {
   private static readonly CONFIG_KEY = "ai_assistant_config";
   private static readonly PROVIDER_KEYS_KEY = "ai_provider_keys";
+  private static readonly TRANSPORT_API_KEYS_KEY = "transport_api_keys";
   
   // Default configuration
   private static readonly DEFAULT_CONFIG: AIAssistantConfig = {
@@ -18,7 +18,7 @@ export class AIConfigService {
     enableVoice: true,
     enableSuggestions: true,
     responseTone: "professional",
-    allowedCommands: ["navigation", "search", "information", "action"],
+    allowedCommands: ["navigation", "search", "information", "action", "transport"],
     apiThrottleLimit: 10,
     defaultPrompt: "You are a helpful assistant for a transportation and logistics platform.",
     providers: {
@@ -27,6 +27,12 @@ export class AIConfigService {
       "Meta": { enabled: false, apiKey: "" },
       "Google": { enabled: false, apiKey: "" },
       "Mistral AI": { enabled: false, apiKey: "" }
+    },
+    transportApis: {
+      "iRail": { enabled: true, apiKey: "" },
+      "STIB/MIVB": { enabled: false, apiKey: "" },
+      "DeLijn": { enabled: false, apiKey: "" },
+      "TEC": { enabled: false, apiKey: "" }
     }
   };
   
@@ -37,6 +43,7 @@ export class AIConfigService {
     try {
       const storedConfig = localStorage.getItem(this.CONFIG_KEY);
       const storedProviderKeys = localStorage.getItem(this.PROVIDER_KEYS_KEY);
+      const storedTransportKeys = localStorage.getItem(this.TRANSPORT_API_KEYS_KEY);
       
       let config = { ...this.DEFAULT_CONFIG };
       
@@ -50,6 +57,16 @@ export class AIConfigService {
         Object.keys(providerKeys).forEach(provider => {
           if (config.providers[provider as AIProviderType]) {
             config.providers[provider as AIProviderType].apiKey = providerKeys[provider];
+          }
+        });
+      }
+      
+      // Load transport API keys separately
+      if (storedTransportKeys && config.transportApis) {
+        const transportKeys = JSON.parse(storedTransportKeys);
+        Object.keys(transportKeys).forEach(api => {
+          if (config.transportApis && config.transportApis[api]) {
+            config.transportApis[api].apiKey = transportKeys[api];
           }
         });
       }
@@ -71,6 +88,7 @@ export class AIConfigService {
       
       // Store API keys separately
       const providerKeys: Record<string, string> = {};
+      const transportKeys: Record<string, string> = {};
       
       Object.entries(updatedConfig.providers).forEach(([provider, providerConfig]) => {
         if (providerConfig.apiKey) {
@@ -78,14 +96,30 @@ export class AIConfigService {
         }
       });
       
+      // Store transport API keys separately
+      if (updatedConfig.transportApis) {
+        Object.entries(updatedConfig.transportApis).forEach(([api, apiConfig]) => {
+          if (apiConfig.apiKey) {
+            transportKeys[api] = apiConfig.apiKey;
+          }
+        });
+      }
+      
       // Store the configuration without API keys
       const configToStore = { ...updatedConfig };
       Object.keys(configToStore.providers).forEach(provider => {
         configToStore.providers[provider as AIProviderType].apiKey = "";
       });
       
+      if (configToStore.transportApis) {
+        Object.keys(configToStore.transportApis).forEach(api => {
+          configToStore.transportApis[api].apiKey = "";
+        });
+      }
+      
       localStorage.setItem(this.CONFIG_KEY, JSON.stringify(configToStore));
       localStorage.setItem(this.PROVIDER_KEYS_KEY, JSON.stringify(providerKeys));
+      localStorage.setItem(this.TRANSPORT_API_KEYS_KEY, JSON.stringify(transportKeys));
       
       console.info("AI Assistant configuration saved successfully");
       
@@ -102,6 +136,7 @@ export class AIConfigService {
   static resetConfig(): AIAssistantConfig {
     localStorage.removeItem(this.CONFIG_KEY);
     localStorage.removeItem(this.PROVIDER_KEYS_KEY);
+    localStorage.removeItem(this.TRANSPORT_API_KEYS_KEY);
     return { ...this.DEFAULT_CONFIG };
   }
 
@@ -139,5 +174,12 @@ export class AIConfigService {
   static getProviderForModel(modelId: AIModelType): AIProviderType {
     const model = this.getAvailableModels().find(m => m.id === modelId);
     return model ? model.provider as AIProviderType : "OpenAI";
+  }
+
+  /**
+   * Get all available transport APIs
+   */
+  static getAvailableTransportAPIs(): string[] {
+    return ["iRail", "STIB/MIVB", "DeLijn", "TEC"];
   }
 }

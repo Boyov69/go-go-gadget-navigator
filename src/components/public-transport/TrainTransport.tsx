@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Search, Train, Clock, MapPin, AlertTriangle } from "lucide-react";
+import iRailService, { iRailStation } from "@/services/transport/iRailService";
 
 interface TrainInfo {
   id: string;
@@ -22,63 +23,68 @@ interface TrainInfo {
 const TrainTransport: React.FC = () => {
   const { t } = useLanguage();
   const [stationQuery, setStationQuery] = useState("");
+  const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+  const [selectedStationName, setSelectedStationName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [stations, setStations] = useState<iRailStation[]>([]);
+  const [showStationResults, setShowStationResults] = useState(false);
+  const [trains, setTrains] = useState<TrainInfo[]>([]);
   
-  // Mock data for trains - this would come from API
-  const [trains, setTrains] = useState<TrainInfo[]>([
-    {
-      id: "t1",
-      number: "IC 512",
-      origin: "Brussels-South",
-      destination: "Antwerp-Central",
-      departureTime: "10:15",
-      arrivalTime: "11:02",
-      platform: "3",
-      status: "on-time"
-    },
-    {
-      id: "t2",
-      number: "IC 1545",
-      origin: "Brussels-Central", 
-      destination: "Ghent-Sint-Pieters",
-      departureTime: "10:25",
-      arrivalTime: "11:10",
-      platform: "4",
-      status: "delayed",
-      delayMinutes: 10
-    },
-    {
-      id: "t3",
-      number: "IC 2806",
-      origin: "Brussels-South",
-      destination: "Liège-Guillemins",
-      departureTime: "10:32",
-      arrivalTime: "11:28",
-      platform: "6",
-      status: "on-time"
-    },
-    {
-      id: "t4",
-      number: "P 8089",
-      origin: "Brussels-South",
-      destination: "Namur",
-      departureTime: "10:45",
-      arrivalTime: "11:32",
-      platform: "8",
-      status: "cancelled"
-    }
-  ]);
+  // Search for stations as user types
+  useEffect(() => {
+    const searchStations = async () => {
+      if (stationQuery.length < 2) {
+        setStations([]);
+        setShowStationResults(false);
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        const results = await iRailService.searchStations(stationQuery);
+        setStations(results);
+        setShowStationResults(true);
+      } catch (error) {
+        console.error("Error searching stations:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    const debounceTimer = setTimeout(searchStations, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [stationQuery]);
+  
+  // Load departures when a station is selected
+  useEffect(() => {
+    const fetchDepartures = async () => {
+      if (!selectedStationId) return;
+      
+      setIsLoading(true);
+      try {
+        const departures = await iRailService.getLiveboard(selectedStationId);
+        const trainInfo = iRailService.convertToTrainInfo(departures);
+        setTrains(trainInfo);
+      } catch (error) {
+        console.error("Error fetching departures:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDepartures();
+  }, [selectedStationId]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    console.log("Searching for station:", stationQuery);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // In a real implementation, setTrains would be updated with API data
-    }, 1000);
+    // This is now handled by the useEffect
+  };
+  
+  const selectStation = (station: iRailStation) => {
+    setSelectedStationId(station.id);
+    setSelectedStationName(station.name);
+    setStationQuery(station.name);
+    setShowStationResults(false);
   };
 
   const getStatusBadge = (status: TrainInfo["status"], delayMinutes?: number) => {
@@ -105,10 +111,15 @@ const TrainTransport: React.FC = () => {
           <CardTitle className="flex items-center gap-2">
             <Train className="h-5 w-5" />
             {t("publicTransport.train.title")}
+            {selectedStationName && (
+              <span className="text-sm font-normal ml-2">
+                - {selectedStationName}
+              </span>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex items-center space-x-2 mb-6">
+          <form onSubmit={handleSearch} className="relative mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -119,58 +130,83 @@ const TrainTransport: React.FC = () => {
                 className="pl-10"
               />
             </div>
-            <Button type="submit" disabled={isLoading || !stationQuery.trim()}>
-              {isLoading ? t("common.loading") : t("common.search")}
-            </Button>
+            
+            {showStationResults && stations.length > 0 && (
+              <div className="absolute w-full bg-white dark:bg-gray-800 mt-1 rounded-md shadow-lg z-10 max-h-64 overflow-y-auto">
+                {stations.map(station => (
+                  <div 
+                    key={station.id}
+                    className="p-2 hover:bg-accent cursor-pointer flex items-center gap-2"
+                    onClick={() => selectStation(station)}
+                  >
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div>{station.name}</div>
+                      {station.alternative_en && (
+                        <div className="text-xs text-muted-foreground">{station.alternative_en}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </form>
           
           <div className="space-y-4">
-            {trains.length > 0 ? trains.map(train => (
-              <div 
-                key={train.id}
-                className="p-4 border rounded-md hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex items-center">
-                    <div className="bg-primary/10 text-primary font-semibold rounded-lg p-2 mr-3">
-                      {train.number}
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : trains.length > 0 ? (
+              trains.map(train => (
+                <div 
+                  key={train.id}
+                  className="p-4 border rounded-md hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex items-center">
+                      <div className="bg-primary/10 text-primary font-semibold rounded-lg p-2 mr-3">
+                        {train.number}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span>{train.departureTime}</span>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground gap-2 mt-1">
+                          <MapPin className="h-4 w-4" />
+                          <span>
+                            {train.origin} → {train.destination}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>{train.departureTime}</span>
+                    
+                    <div className="flex items-center gap-3 mt-2 md:mt-0">
+                      <div className="text-center px-3 py-1 bg-muted rounded-md">
+                        <div className="text-xs text-muted-foreground">Platform</div>
+                        <div className="font-semibold">{train.platform}</div>
                       </div>
-                      <div className="flex items-center text-sm text-muted-foreground gap-2 mt-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>
-                          {train.origin} → {train.destination}
-                        </span>
-                      </div>
+                      
+                      {getStatusBadge(train.status, train.delayMinutes)}
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3 mt-2 md:mt-0">
-                    <div className="text-center px-3 py-1 bg-muted rounded-md">
-                      <div className="text-xs text-muted-foreground">Platform</div>
-                      <div className="font-semibold">{train.platform}</div>
+                  {train.status === "delayed" && train.delayMinutes && (
+                    <div className="mt-3 text-sm flex items-center gap-1 text-amber-600 bg-amber-50 p-2 rounded">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span>New arrival time: {train.arrivalTime}</span>
                     </div>
-                    
-                    {getStatusBadge(train.status, train.delayMinutes)}
-                  </div>
+                  )}
                 </div>
-                
-                {train.status === "delayed" && (
-                  <div className="mt-3 text-sm flex items-center gap-1 text-amber-600 bg-amber-50 p-2 rounded">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span>New arrival time: {train.arrivalTime}</span>
-                  </div>
-                )}
-              </div>
-            )) : (
+              ))
+            ) : (
               <div className="text-center py-12">
                 <Train className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
                 <p className="mt-2 text-muted-foreground">
-                  {t("publicTransport.train.noResults")}
+                  {selectedStationId ? 
+                    "No departures found for this station" : 
+                    t("publicTransport.train.noResults")}
                 </p>
               </div>
             )}

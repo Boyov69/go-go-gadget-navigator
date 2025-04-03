@@ -14,7 +14,8 @@ import {
   Package,
   ChevronLeft,
   LayoutDashboard,
-  Crown
+  Crown,
+  Train
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -36,6 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { icon: Home, label: "Home", path: "/" },
     { icon: Map, label: "Explore", path: "/explore" },
     { icon: Compass, label: "Navigate", path: "/navigate" },
+    { icon: Train, label: "Public Transport", path: "/public-transport" },
     { icon: BookMarked, label: "Saved Trips", path: "/saved-trips" },
     { icon: Package, label: "Cargo", path: "/cargo" },
     { icon: Building, label: "Providers", path: "/suppliers" },
