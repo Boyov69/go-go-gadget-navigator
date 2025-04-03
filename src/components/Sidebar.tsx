@@ -1,25 +1,8 @@
 
 import React, { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
-  Home, 
-  Map, 
-  Compass, 
-  BookMarked, 
-  Settings, 
-  Heart, 
-  LogOut, 
-  Building,
-  Package,
-  ChevronLeft,
-  LayoutDashboard,
-  Crown,
-  Train
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "@/hooks/use-toast";
-import { UserRole } from "@/services/auth";
+import SidebarHeader from "./sidebar/SidebarHeader";
+import SidebarNav from "./sidebar/SidebarNav";
+import SidebarFooter from "./sidebar/SidebarFooter";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -27,88 +10,23 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { logout, user } = useAuth();
   const sidebarRef = useRef<HTMLDivElement>(null);
-  
-  // Base menu items available for all users
-  const baseMenuItems = [
-    { icon: Home, label: "Home", path: "/" },
-    { icon: Map, label: "Explore", path: "/explore" },
-    { icon: Compass, label: "Navigate", path: "/navigate" },
-    { icon: Train, label: "Public Transport", path: "/public-transport" },
-    { icon: BookMarked, label: "Saved Trips", path: "/saved-trips" },
-    { icon: Package, label: "Cargo", path: "/cargo" },
-    { icon: Building, label: "Providers", path: "/suppliers" },
-    { icon: Heart, label: "Favorites", path: "/favorites" },
-    { icon: Settings, label: "Settings", path: "/settings" },
-  ];
-  
-  // Admin menu items that only appear for admin users
-  const adminMenuItems = [
-    { icon: LayoutDashboard, label: "Admin Dashboard", path: "/admin/dashboard" },
-  ];
-  
-  // Super admin menu items
-  const superAdminMenuItems = [
-    { icon: Crown, label: "Super Admin Dashboard", path: "/super-admin/dashboard" },
-  ];
-  
-  // Combine menu items based on user role
-  const menuItems = React.useMemo(() => {
-    let items = [...baseMenuItems];
-    
-    if (user) {
-      if (user.role === UserRole.ADMIN) {
-        items = [...items, ...adminMenuItems];
-      }
-      if (user.role === UserRole.SUPER_ADMIN) {
-        items = [...items, ...adminMenuItems, ...superAdminMenuItems];
-      }
-    }
-    
-    return items;
-  }, [user]);
 
-  const handleLogout = () => {
-    // Call the logout function from auth context
-    logout();
-    
-    // Add toast notification
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account",
-      duration: 3000,
-      role: "status", // Add ARIA role for screen readers
-    });
-    
-    // Navigate to home page
-    navigate("/");
-  };
-
-  // Handle keyboard navigation
   const handleKeyDown = (e: KeyboardEvent) => {
     if (!isOpen) return;
-
-    // Close sidebar on Escape key
     if (e.key === 'Escape') {
       toggleSidebar();
     }
   };
 
-  // Trap focus within sidebar when it's open
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
-      
-      // Focus the first interactive element when sidebar opens
       const firstFocusableElement = sidebarRef.current?.querySelector('a, button') as HTMLElement;
       if (firstFocusableElement) {
         firstFocusableElement.focus();
       }
     }
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -116,7 +34,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 md:hidden" 
@@ -125,7 +42,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         />
       )}
       
-      {/* Sidebar */}
       <aside 
         ref={sidebarRef}
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-gray-900 border-r shadow-lg transition-transform duration-300 ease-in-out ${
@@ -136,66 +52,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         role="navigation"
       >
         <div className="flex flex-col h-full">
-          {/* Header with collapsing button */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <Link 
-              to="/" 
-              className={`flex items-center gap-2 ${!isOpen && "md:hidden"}`}
-              aria-label="Go to home page"
-            >
-              <Map className="h-6 w-6 text-primary" aria-hidden="true" />
-              <span className="text-lg font-bold">Go-Go</span>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSidebar}
-              className="md:flex"
-              aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-              title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {isOpen ? <ChevronLeft className="h-4 w-4" aria-hidden="true" /> : <Map className="h-4 w-4" aria-hidden="true" />}
-            </Button>
-          </div>
-          
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-2">
-            <ul className="space-y-1" role="menu">
-              {menuItems.map((item, index) => (
-                <li key={item.label} role="none">
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      location.pathname === item.path
-                        ? "bg-primary text-white"
-                        : "hover:bg-accent"
-                    }`}
-                    title={item.label}
-                    role="menuitem"
-                    aria-current={location.pathname === item.path ? "page" : undefined}
-                    tabIndex={0}
-                  >
-                    <item.icon className="h-5 w-5" aria-hidden="true" />
-                    {isOpen && <span>{item.label}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          
-          {/* Footer */}
-          <div className="p-4 border-t">
-            <Button 
-              variant="outline" 
-              className={`w-full flex items-center gap-2 ${!isOpen && "md:p-2 md:justify-center"}`}
-              onClick={handleLogout}
-              title="Logout"
-              aria-label="Logout from your account"
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              {isOpen && <span>Logout</span>}
-            </Button>
-          </div>
+          <SidebarHeader isOpen={isOpen} toggleSidebar={toggleSidebar} />
+          <SidebarNav isOpen={isOpen} />
+          <SidebarFooter isOpen={isOpen} />
         </div>
       </aside>
     </>
