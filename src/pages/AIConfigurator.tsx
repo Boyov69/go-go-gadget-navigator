@@ -13,8 +13,8 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TabsList, TabsTrigger, TabsContent, Tabs } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, Save, RotateCcw, Settings, AlertCircle, BrainCircuit, Mic, MessageSquare } from "lucide-react";
-import { AIAssistantConfig } from "@/types/aiAssistant";
+import { AlertTriangle, Save, RotateCcw, Settings, AlertCircle, BrainCircuit, Mic, MessageSquare, Key } from "lucide-react";
+import { AIAssistantConfig, AIProviderType } from "@/types/aiAssistant";
 import { AIConfigService } from "@/services/ai/AIConfigService";
 import AdminGuard from "@/components/guards/AdminGuard";
 import { UserRole } from "@/services/auth";
@@ -30,6 +30,22 @@ const AIConfigurator: React.FC = () => {
   const form = useForm<AIAssistantConfig>({
     defaultValues: AIConfigService.getConfig()
   });
+  
+  // Track selected model to show appropriate provider API key
+  const [selectedProvider, setSelectedProvider] = useState<AIProviderType>(
+    AIConfigService.getProviderForModel(form.getValues().model)
+  );
+
+  // Update selected provider when model changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'model' && value.model) {
+        const provider = AIConfigService.getProviderForModel(value.model);
+        setSelectedProvider(provider);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -73,6 +89,9 @@ const AIConfigurator: React.FC = () => {
 
   // Get all available models
   const availableModels = AIConfigService.getAvailableModels();
+  
+  // Get all available providers
+  const availableProviders = AIConfigService.getAvailableProviders();
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -116,6 +135,7 @@ const AIConfigurator: React.FC = () => {
                     <TabsList className="mb-4">
                       <TabsTrigger value="general">General</TabsTrigger>
                       <TabsTrigger value="model">Model Settings</TabsTrigger>
+                      <TabsTrigger value="api">API Keys</TabsTrigger>
                       <TabsTrigger value="features">Features</TabsTrigger>
                       <TabsTrigger value="advanced">Advanced</TabsTrigger>
                     </TabsList>
@@ -268,6 +288,123 @@ const AIConfigurator: React.FC = () => {
                           </FormItem>
                         )}
                       />
+                    </TabsContent>
+                    
+                    <TabsContent value="api" className="space-y-4">
+                      <div className="p-3 border rounded-md bg-blue-50 dark:bg-blue-950/30 mb-4">
+                        <div className="flex items-start gap-3">
+                          <Key className="h-5 w-5 text-blue-600 mt-0.5" />
+                          <div>
+                            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200">API Key Configuration</h4>
+                            <p className="text-sm mt-1 text-blue-700 dark:text-blue-300">
+                              Add API keys for each model provider to connect to real AI models. 
+                              Keys are stored securely in your browser's local storage.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {availableProviders.map((provider) => (
+                        <div key={provider} className="space-y-4 border-b pb-4 last:border-0">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-medium">{provider}</h3>
+                            <FormField
+                              control={form.control}
+                              name={`providers.${provider}.enabled`}
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-center space-x-2">
+                                  <FormLabel>Enabled</FormLabel>
+                                  <FormControl>
+                                    <Switch
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <FormField
+                            control={form.control}
+                            name={`providers.${provider}.apiKey`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>API Key</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="password"
+                                    placeholder={`Enter your ${provider} API key`}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  {provider === "OpenAI" && "Get your API key from https://platform.openai.com/account/api-keys"}
+                                  {provider === "Anthropic" && "Get your API key from https://console.anthropic.com/account/keys"}
+                                  {provider === "Meta" && "Contact Meta to obtain your Llama API credentials"}
+                                  {provider === "Google" && "Get your API key from Google AI Studio"}
+                                  {provider === "Mistral AI" && "Get your API key from https://console.mistral.ai/api-keys/"}
+                                </FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                          
+                          {provider === "OpenAI" && (
+                            <FormField
+                              control={form.control}
+                              name={`providers.${provider}.organizationId`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Organization ID (Optional)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Enter your OpenAI Organization ID"
+                                      {...field}
+                                      value={field.value || ""}
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Only required if you're using an organization in OpenAI
+                                  </FormDescription>
+                                </FormItem>
+                              )}
+                            />
+                          )}
+                          
+                          <FormField
+                            control={form.control}
+                            name={`providers.${provider}.endpoint`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Custom API Endpoint (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={`Enter custom ${provider} API endpoint`}
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Only required if you're using a custom deployment or proxy
+                                </FormDescription>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      ))}
+                      
+                      {selectedProvider && (
+                        <div className="p-3 border rounded-md bg-green-50 dark:bg-green-950/30 mt-4">
+                          <div className="flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                            <div>
+                              <h4 className="text-sm font-medium text-green-800 dark:text-green-200">Current Model Provider</h4>
+                              <p className="text-sm mt-1 text-green-700 dark:text-green-300">
+                                The currently selected model ({form.getValues().model}) requires a valid {selectedProvider} API key.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </TabsContent>
                     
                     <TabsContent value="features" className="space-y-4">

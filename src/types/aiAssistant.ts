@@ -51,6 +51,15 @@ export type AIModelType =
   | "mistral-medium" 
   | "mixtral-8x7b";
 
+export type AIProviderType = "OpenAI" | "Anthropic" | "Meta" | "Google" | "Mistral AI";
+
+export interface AIProviderConfig {
+  enabled: boolean;
+  apiKey: string;
+  organizationId?: string;
+  endpoint?: string;
+}
+
 export interface AIAssistantConfig {
   enabled: boolean;
   model: AIModelType;
@@ -63,4 +72,5 @@ export interface AIAssistantConfig {
   allowedCommands: string[];
   apiThrottleLimit: number;
   defaultPrompt: string;
+  providers: Record<AIProviderType, AIProviderConfig>;
 }

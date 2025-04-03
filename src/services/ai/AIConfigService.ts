@@ -1,11 +1,12 @@
 
-import { AIAssistantConfig, AIModelType } from "@/types/aiAssistant";
+import { AIAssistantConfig, AIModelType, AIProviderType } from "@/types/aiAssistant";
 
 /**
  * Service for managing AI Assistant configuration
  */
 export class AIConfigService {
   private static readonly CONFIG_KEY = "ai_assistant_config";
+  private static readonly PROVIDER_KEYS_KEY = "ai_provider_keys";
   
   // Default configuration
   private static readonly DEFAULT_CONFIG: AIAssistantConfig = {
@@ -19,7 +20,14 @@ export class AIConfigService {
     responseTone: "professional",
     allowedCommands: ["navigation", "search", "information", "action"],
     apiThrottleLimit: 10,
-    defaultPrompt: "You are a helpful assistant for a transportation and logistics platform."
+    defaultPrompt: "You are a helpful assistant for a transportation and logistics platform.",
+    providers: {
+      "OpenAI": { enabled: true, apiKey: "" },
+      "Anthropic": { enabled: false, apiKey: "" },
+      "Meta": { enabled: false, apiKey: "" },
+      "Google": { enabled: false, apiKey: "" },
+      "Mistral AI": { enabled: false, apiKey: "" }
+    }
   };
   
   /**
@@ -28,14 +36,29 @@ export class AIConfigService {
   static getConfig(): AIAssistantConfig {
     try {
       const storedConfig = localStorage.getItem(this.CONFIG_KEY);
+      const storedProviderKeys = localStorage.getItem(this.PROVIDER_KEYS_KEY);
+      
+      let config = { ...this.DEFAULT_CONFIG };
+      
       if (storedConfig) {
-        return { ...this.DEFAULT_CONFIG, ...JSON.parse(storedConfig) };
+        config = { ...config, ...JSON.parse(storedConfig) };
       }
+      
+      // Load provider API keys separately for better security
+      if (storedProviderKeys) {
+        const providerKeys = JSON.parse(storedProviderKeys);
+        Object.keys(providerKeys).forEach(provider => {
+          if (config.providers[provider as AIProviderType]) {
+            config.providers[provider as AIProviderType].apiKey = providerKeys[provider];
+          }
+        });
+      }
+      
+      return config;
     } catch (error) {
       console.error("Error retrieving AI config:", error);
+      return { ...this.DEFAULT_CONFIG };
     }
-    
-    return { ...this.DEFAULT_CONFIG };
   }
   
   /**
@@ -46,7 +69,24 @@ export class AIConfigService {
       const currentConfig = this.getConfig();
       const updatedConfig = { ...currentConfig, ...config };
       
-      localStorage.setItem(this.CONFIG_KEY, JSON.stringify(updatedConfig));
+      // Store API keys separately
+      const providerKeys: Record<string, string> = {};
+      
+      Object.entries(updatedConfig.providers).forEach(([provider, providerConfig]) => {
+        if (providerConfig.apiKey) {
+          providerKeys[provider] = providerConfig.apiKey;
+        }
+      });
+      
+      // Store the configuration without API keys
+      const configToStore = { ...updatedConfig };
+      Object.keys(configToStore.providers).forEach(provider => {
+        configToStore.providers[provider as AIProviderType].apiKey = "";
+      });
+      
+      localStorage.setItem(this.CONFIG_KEY, JSON.stringify(configToStore));
+      localStorage.setItem(this.PROVIDER_KEYS_KEY, JSON.stringify(providerKeys));
+      
       console.info("AI Assistant configuration saved successfully");
       
       return updatedConfig;
@@ -61,6 +101,7 @@ export class AIConfigService {
    */
   static resetConfig(): AIAssistantConfig {
     localStorage.removeItem(this.CONFIG_KEY);
+    localStorage.removeItem(this.PROVIDER_KEYS_KEY);
     return { ...this.DEFAULT_CONFIG };
   }
 
@@ -83,5 +124,20 @@ export class AIConfigService {
       { id: "mistral-medium", name: "Mistral Medium", provider: "Mistral AI" },
       { id: "mixtral-8x7b", name: "Mixtral 8x7B", provider: "Mistral AI" }
     ];
+  }
+
+  /**
+   * Get all available AI providers
+   */
+  static getAvailableProviders(): AIProviderType[] {
+    return ["OpenAI", "Anthropic", "Meta", "Google", "Mistral AI"];
+  }
+
+  /**
+   * Get the provider for a specific model
+   */
+  static getProviderForModel(modelId: AIModelType): AIProviderType {
+    const model = this.getAvailableModels().find(m => m.id === modelId);
+    return model ? model.provider as AIProviderType : "OpenAI";
   }
 }
