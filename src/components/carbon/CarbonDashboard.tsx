@@ -107,13 +107,13 @@ const CarbonDashboard: React.FC = () => {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${(Number(percent) * 100).toFixed(0)}%`}
                     >
                       {breakdownData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `${(value / 1000).toFixed(1)} kg CO₂`} />
+                    <Tooltip formatter={(value) => `${(Number(value) / 1000).toFixed(1)} kg CO₂`} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -142,7 +142,7 @@ const CarbonDashboard: React.FC = () => {
                   >
                     <XAxis dataKey="month" />
                     <YAxis tickFormatter={(value) => `${value / 1000}kg`} />
-                    <Tooltip formatter={(value) => `${(value / 1000).toFixed(1)} kg CO₂`} />
+                    <Tooltip formatter={(value) => `${(Number(value) / 1000).toFixed(1)} kg CO₂`} />
                     <Bar dataKey="emissionsGrams" fill="#3498db" name="Emissions" />
                     <Bar dataKey="offsetGrams" fill="#2ecc71" name="Offset" />
                   </BarChart>

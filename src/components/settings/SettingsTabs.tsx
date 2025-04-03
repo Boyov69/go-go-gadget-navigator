@@ -15,7 +15,7 @@ const SettingsTabs = () => {
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Keyboard navigation for tabs
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     const tabElements = tabsRef.current?.querySelectorAll('[role="tab"]');
     if (!tabElements) return;
     

@@ -1,6 +1,6 @@
-
 import { GeoLocation, Route, VehicleCategory } from '@/types/providerApi';
 import { CarbonTrackingServiceInterface } from '@/types/carbonTracking';
+import { FiatCurrency } from '@/types/wallet';
 
 interface TravelPattern {
   frequentDestinations: {
@@ -19,7 +19,7 @@ interface TravelPattern {
   }[];
 }
 
-interface UserPreference {
+export interface UserPreference {
   userId: string;
   prefersCheapest: boolean;
   prefersFastest: boolean;
@@ -115,14 +115,14 @@ class MockRecommendationService implements RecommendationServiceInterface {
         duration: 12,
         carbonEmission: 1200,
         price: 12.50,
-        currency: 'EUR',
+        currency: FiatCurrency.EUR,
         vehicleCategory: VehicleCategory.TAXI
       }],
       totalDistance: 5.2,
       totalDuration: 12,
       totalCarbonEmission: 1200,
       totalPrice: 12.50,
-      currency: 'EUR'
+      currency: FiatCurrency.EUR
     };
     
     // Eco-friendly route
@@ -138,7 +138,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
           duration: 5,
           carbonEmission: 0,
           price: 3.50,
-          currency: 'EUR',
+          currency: FiatCurrency.EUR,
           vehicleCategory: VehicleCategory.BIKE
         },
         {
@@ -151,7 +151,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
           duration: 15,
           carbonEmission: 200,
           price: 2.00,
-          currency: 'EUR',
+          currency: FiatCurrency.EUR,
           vehicleCategory: VehicleCategory.BUS
         }
       ],
@@ -159,7 +159,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
       totalDuration: 25,
       totalCarbonEmission: 200,
       totalPrice: 5.50,
-      currency: 'EUR'
+      currency: FiatCurrency.EUR
     };
     
     // Budget route
@@ -175,7 +175,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
           duration: 25,
           carbonEmission: 0,
           price: 0,
-          currency: 'EUR',
+          currency: FiatCurrency.EUR,
           vehicleCategory: VehicleCategory.SCOOTER
         },
         {
@@ -188,7 +188,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
           duration: 12,
           carbonEmission: 200,
           price: 2.00,
-          currency: 'EUR',
+          currency: FiatCurrency.EUR,
           vehicleCategory: VehicleCategory.METRO
         }
       ],
@@ -196,7 +196,7 @@ class MockRecommendationService implements RecommendationServiceInterface {
       totalDuration: 37,
       totalCarbonEmission: 200,
       totalPrice: 2.00,
-      currency: 'EUR'
+      currency: FiatCurrency.EUR
     };
     
     // Push routes in preference order
