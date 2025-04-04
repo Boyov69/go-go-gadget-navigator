@@ -2,9 +2,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Vector3 } from 'three';
+import * as THREE from 'three';
 import { Bot, Mic, Loader2, MessageCircle, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAI } from '@/contexts/AIContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -147,7 +147,7 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
               onClick={onClick}
             >
               <div className="w-full h-full rounded-full shadow-lg overflow-hidden">
-                <Canvas camera={{ position: new Vector3(0, 0, 5), fov: 45 }}>
+                <Canvas camera={{ position: new THREE.Vector3(0, 0, 5), fov: 45 }}>
                   <ambientLight intensity={0.5} />
                   <pointLight position={[10, 10, 10]} intensity={1} />
                   <spotLight 
