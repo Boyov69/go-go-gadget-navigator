@@ -81,9 +81,9 @@ const BotModel: React.FC<BotModelProps> = ({
   const flyingSaucer = useMemo(() => {
     const group = new THREE.Group();
     
-    // Saucer top
+    // Saucer top - Changed from MeshPhongMaterial to MeshStandardMaterial
     const topGeometry = new THREE.SphereGeometry(0.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-    const topMaterial = new THREE.MeshPhongMaterial({ 
+    const topMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x888888, 
       metalness: 0.8,
       roughness: 0.2
@@ -91,9 +91,9 @@ const BotModel: React.FC<BotModelProps> = ({
     const top = new THREE.Mesh(topGeometry, topMaterial);
     top.position.y = 0.05;
     
-    // Saucer bottom
+    // Saucer bottom - Changed from MeshPhongMaterial to MeshStandardMaterial
     const bottomGeometry = new THREE.SphereGeometry(0.25, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-    const bottomMaterial = new THREE.MeshPhongMaterial({ 
+    const bottomMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x666666,
       metalness: 0.8, 
       roughness: 0.3
