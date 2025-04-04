@@ -1,6 +1,7 @@
 
 import React, { useRef, useMemo } from 'react';
-import { useTexture, useFrame, Sphere } from '@react-three/drei';
+import { useTexture, Sphere } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface EarthModelProps {

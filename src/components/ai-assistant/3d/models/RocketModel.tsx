@@ -63,11 +63,17 @@ const RocketModel: React.FC<RocketModelProps> = ({
           mesh.position.x = Math.cos(angle) * radius;
           mesh.position.z = Math.sin(angle) * radius;
           
-          // Material opacity
-          (mesh.material as THREE.MeshBasicMaterial).opacity = 1;
+          // Material opacity - ensure we're working with MeshBasicMaterial
+          const material = mesh.material as THREE.MeshBasicMaterial;
+          if (material) {
+            material.opacity = 1;
+          }
         } else {
           // Fade out as it moves
-          (mesh.material as THREE.MeshBasicMaterial).opacity *= 0.95;
+          const material = mesh.material as THREE.MeshBasicMaterial;
+          if (material) {
+            material.opacity *= 0.95;
+          }
         }
       });
     }

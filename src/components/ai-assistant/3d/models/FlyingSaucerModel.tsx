@@ -38,7 +38,13 @@ const FlyingSaucerModel: React.FC<FlyingSaucerModelProps> = ({
     if (beamRef.current) {
       // Pulse the tractor beam
       const beamPulse = Math.sin(clock.getElapsedTime() * 4) * 0.5 + 0.5;
-      beamRef.current.material.opacity = 0.3 + beamPulse * 0.3;
+      
+      // Fix: Access opacity through material property ensuring it's MeshBasicMaterial
+      const material = beamRef.current.material as THREE.MeshBasicMaterial;
+      if (material) {
+        material.opacity = 0.3 + beamPulse * 0.3;
+      }
+      
       beamRef.current.scale.y = 1 + beamPulse * 0.2;
       
       // Only show beam during processing or listening

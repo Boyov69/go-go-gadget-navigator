@@ -7,10 +7,13 @@ import {
   PerspectiveCamera, 
   AdaptiveDpr, 
   Stars, 
-  Preload,
-  Effects
+  Preload
 } from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing';
+import { 
+  EffectComposer, 
+  Bloom, 
+  ChromaticAberration 
+} from '@react-three/postprocessing';
 import BotModel from './BotModel';
 
 interface BotCanvasProps {
@@ -93,8 +96,6 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         />
         <ChromaticAberration 
           offset={[0.0005, 0.0005]} 
-          radialModulation={true}
-          modulationOffset={0.5}
         />
       </EffectComposer>
       

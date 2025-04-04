@@ -62,7 +62,6 @@ const OrbitGroup: React.FC<OrbitGroupProps> = ({ isProcessing, isListening }) =>
         length={5}
         decay={5}
         attenuation={(width) => width}
-        opacity={0.3}
       >
         <mesh
           ref={rocketRef}
@@ -87,7 +86,6 @@ const OrbitGroup: React.FC<OrbitGroupProps> = ({ isProcessing, isListening }) =>
         length={5}
         decay={5}
         attenuation={(width) => width}
-        opacity={0.3}
       >
         <mesh
           ref={saucerRef}
