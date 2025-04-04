@@ -18,7 +18,7 @@ const BotModel: React.FC<BotModelProps> = ({
   isChatOpen, 
   pulseAnimation 
 }) => {
-  const earthRef = useRef<THREE.Mesh>(null);
+  const earthRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   
   // Animations and rotations
