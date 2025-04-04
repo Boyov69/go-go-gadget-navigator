@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { motion } from 'framer-motion';
 
 interface BotModelProps { 
   isProcessing: boolean; 
@@ -19,13 +20,16 @@ const BotModel: React.FC<BotModelProps> = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   
-  // Rotation animation
+  // Rotation and hover animations
   useFrame((state) => {
     if (!meshRef.current) return;
     
-    // Hover effect
+    // Hover effect with subtle bounce
     if (hovered) {
       meshRef.current.rotation.y += 0.02;
+      // Add a slight scale bounce on hover
+      const bounceFactor = 1 + Math.sin(state.clock.getElapsedTime() * 5) * 0.05;
+      meshRef.current.scale.set(bounceFactor, bounceFactor, bounceFactor);
     } else if (isProcessing || isListening) {
       meshRef.current.rotation.y += 0.03;
       meshRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 2) * 0.1;

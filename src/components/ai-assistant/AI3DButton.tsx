@@ -57,7 +57,14 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
           <TooltipTrigger asChild>
             <motion.div
               className="w-14 h-14 cursor-pointer"
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ 
+                scale: 1.1,
+                transition: { 
+                  duration: 0.2,
+                  repeat: Infinity,
+                  repeatType: "mirror"
+                }
+              }}
               whileTap={{ scale: 0.95 }}
               onClick={onClick}
             >
