@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Map, Menu, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import NavigationModeToggle from "./navigation/NavigationModeToggle";
+import { useNavigationMode } from "@/contexts/NavigationModeContext";
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -12,6 +14,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
   const navigate = useNavigate();
+  const { mode } = useNavigationMode();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,18 +42,21 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
           </Link>
         </div>
         
-        <div className="hidden md:flex items-center w-full max-w-md mx-6">
-          <form onSubmit={handleSearch} className="relative w-full">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search destinations..."
-              className="w-full pl-8 bg-background"
-            />
-          </form>
-        </div>
+        {mode === 'manual' && (
+          <div className="hidden md:flex items-center w-full max-w-md mx-6">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search destinations..."
+                className="w-full pl-8 bg-background"
+              />
+            </form>
+          </div>
+        )}
         
         <div className="flex items-center gap-2">
+          <NavigationModeToggle />
           <Button variant="ghost" size="sm" className="hidden md:flex">
             Help
           </Button>
@@ -65,4 +71,3 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
 };
 
 export default Navbar;
-

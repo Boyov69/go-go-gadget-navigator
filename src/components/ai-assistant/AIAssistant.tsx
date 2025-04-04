@@ -8,15 +8,18 @@ import { ChatProvider } from '@/contexts/ChatContext';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
 import { Drawer } from '@/components/ui/drawer';
 import { useAssistantKeyboardShortcuts } from '@/hooks/useAssistantKeyboardShortcuts';
+import { useNavigationMode } from '@/contexts/NavigationModeContext';
 
 // Component imports
 import AI3DButton from './AI3DButton';
 import ChatInterface from '@/components/chat/ChatInterface';
 import AssistantDrawer from './AssistantDrawer';
+import AIAssistantButton from './AIAssistantButton';
 
 const AIAssistant: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { mode } = useNavigationMode();
   const { 
     isProcessing, setIsProcessing, 
     lastCommand, setLastCommand, 
@@ -28,6 +31,21 @@ const AIAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [response, setResponse] = useState<string>('');
+  
+  // Auto-open AI interface in AI mode based on preferred mode
+  useEffect(() => {
+    if (mode === 'ai' && !isChatOpen && !isOpen) {
+      if (preferredMode === 'chat') {
+        setIsChatOpen(true);
+      } else {
+        // Wait a bit to avoid immediate activation
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [mode, preferredMode, isChatOpen, isOpen]);
   
   // Use the keyboard shortcuts hook
   useAssistantKeyboardShortcuts({
@@ -81,16 +99,6 @@ const AIAssistant: React.FC = () => {
     }
   }, [isOpen, isChatOpen, setPreferredMode]);
 
-  // Show initial interface based on preferred mode
-  useEffect(() => {
-    const initialDelay = setTimeout(() => {
-      if (preferredMode === 'chat' && !isChatOpen && !isOpen) {
-        setIsChatOpen(true);
-      }
-    }, 1000);
-    return () => clearTimeout(initialDelay);
-  }, [preferredMode, isChatOpen, isOpen]);
-
   const handleButtonClick = () => {
     // Toggle between chat and voice modes
     if (isChatOpen) {
@@ -103,15 +111,34 @@ const AIAssistant: React.FC = () => {
     }
   };
 
-  return (
-    <ErrorBoundary>
-      <ChatProvider>
-        {/* 3D floating assistant button */}
-        <AI3DButton 
+  // Choose which button component to show based on preference
+  const ButtonComponent = () => {
+    // If we're in classic mode, show the regular button
+    if (mode === 'manual') {
+      return (
+        <AIAssistantButton 
           onClick={handleButtonClick} 
           isOpen={isOpen} 
           isChatOpen={isChatOpen} 
         />
+      );
+    }
+    
+    // In AI mode, show the 3D button
+    return (
+      <AI3DButton 
+        onClick={handleButtonClick} 
+        isOpen={isOpen} 
+        isChatOpen={isChatOpen} 
+      />
+    );
+  };
+
+  return (
+    <ErrorBoundary>
+      <ChatProvider>
+        {/* Button for opening the assistant */}
+        <ButtonComponent />
         
         {/* Chat Interface */}
         <ChatInterface 

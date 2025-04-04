@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import QuickTools from "@/components/QuickTools";
@@ -12,9 +12,25 @@ import RightSidebar from "@/components/dashboard/RightSidebar";
 import AIAssistant from "@/components/ai-assistant/AIAssistant";
 import AIFeatureShowcase from "@/components/ai-features/AIFeatureShowcase";
 import AIWelcomeBanner from "@/components/ai-features/AIWelcomeBanner";
+import AIModeTutorial from "@/components/ai-features/AIModeTutorial";
+import { useNavigationMode } from "@/contexts/NavigationModeContext";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { mode } = useNavigationMode();
+  const [showAITutorial, setShowAITutorial] = useState(false);
+  
+  // Show AI tutorial when switching to AI mode for the first time
+  useEffect(() => {
+    if (mode === 'ai') {
+      // Check if the user has seen the tutorial before
+      const hasSeenTutorial = localStorage.getItem('hasSeenAITutorial');
+      if (!hasSeenTutorial) {
+        setShowAITutorial(true);
+        localStorage.setItem('hasSeenAITutorial', 'true');
+      }
+    }
+  }, [mode]);
   
   // Sample driver reviews
   const driverReviews = [
@@ -47,7 +63,9 @@ const Index: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      {mode === 'manual' && (
+        <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      )}
       
       <div className="flex-1 flex flex-col">
         <Navbar toggleSidebar={toggleSidebar}>
@@ -57,6 +75,11 @@ const Index: React.FC = () => {
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 pb-20 md:pb-6">
           {/* AI Welcome Banner */}
           <AIWelcomeBanner />
+          
+          {/* AI Mode Tutorial */}
+          {mode === 'ai' && showAITutorial && (
+            <AIModeTutorial onClose={() => setShowAITutorial(false)} />
+          )}
           
           {/* Quick Tools at the top - more visible */}
           <div className="mb-6">

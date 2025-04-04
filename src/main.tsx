@@ -10,6 +10,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { AIProvider } from "./contexts/AIContext";
 import { AIConfigProvider } from "./contexts/AIConfigContext";
 import { ChatProvider } from "./contexts/ChatContext";
+import { NavigationModeProvider } from "./contexts/NavigationModeContext";
 
 // Create a client for react-query
 const queryClient = new QueryClient();
@@ -21,10 +22,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <LanguageProvider>
           <AIConfigProvider>
             <AIProvider>
-              <ChatProvider>
-                <App />
-                <Toaster />
-              </ChatProvider>
+              <NavigationModeProvider>
+                <ChatProvider>
+                  <App />
+                  <Toaster />
+                </ChatProvider>
+              </NavigationModeProvider>
             </AIProvider>
           </AIConfigProvider>
         </LanguageProvider>
