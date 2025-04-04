@@ -35,11 +35,11 @@ const FlyingSaucerModel: React.FC<FlyingSaucerModelProps> = ({
       saucerRef.current.rotation.y += 0.01;
     }
     
-    if (beamRef.current) {
+    if (beamRef.current && beamRef.current.material) {
       // Pulse the tractor beam
       const beamPulse = Math.sin(clock.getElapsedTime() * 4) * 0.5 + 0.5;
       
-      // Fix: Access opacity through material property ensuring it's MeshBasicMaterial
+      // Access opacity through material property ensuring it's MeshBasicMaterial
       const material = beamRef.current.material as THREE.MeshBasicMaterial;
       if (material) {
         material.opacity = 0.3 + beamPulse * 0.3;
