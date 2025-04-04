@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAI } from '@/contexts/AIContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import BotCanvas from './3d/BotCanvas';
-import KeyboardShortcutHints from './KeyboardShortcutHints';
 import StatusIndicator from './ui/StatusIndicator';
 import { Bot } from 'lucide-react';
 
@@ -18,6 +17,7 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
   const { isProcessing, isListening } = useAI();
   const [pulseAnimation, setPulseAnimation] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
+  const [showHints, setShowHints] = useState(true);
   const [useWebGL, setUseWebGL] = useState(true);
 
   // Monitor WebGL context and switch to fallback if needed
@@ -54,11 +54,26 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     
     return () => clearTimeout(timeout);
   }, []);
+  
+  // Hide the keyboard shortcuts info after 10 seconds or on interaction
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowHints(false);
+    }, 10000);
+    
+    return () => clearTimeout(timeout);
+  }, []);
 
   const getTooltipText = () => {
     if (isChatOpen) return "Close chat";
     if (isOpen) return "Switch to chat mode";
     return "Open AI Assistant (Alt+A for voice, Alt+C for chat)";
+  };
+
+  // Handle click and hide shortcuts
+  const handleButtonClick = () => {
+    setShowHints(false);
+    onClick();
   };
 
   // Fallback button when WebGL is not available
@@ -100,7 +115,7 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
                 }
               }}
               whileTap={{ scale: 0.95 }}
-              onClick={onClick}
+              onClick={handleButtonClick}
             >
               <div className="w-full h-full rounded-full shadow-lg overflow-hidden">
                 {useWebGL ? (
@@ -128,7 +143,26 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
         
         {/* Keyboard shortcut hints */}
         <AnimatePresence>
-          <KeyboardShortcutHints isVisible={!isOpen && !isChatOpen} />
+          {showHints && !isOpen && !isChatOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ delay: 0.2 }}
+              className="absolute -bottom-24 right-0 bg-background shadow-md rounded-md p-3 z-40 border"
+            >
+              <div className="flex flex-col gap-2 items-center text-sm">
+                <div className="flex gap-2 items-center">
+                  <kbd className="px-2 py-1 text-xs rounded border bg-muted">Alt+A</kbd> 
+                  <span>for voice</span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <kbd className="px-2 py-1 text-xs rounded border bg-muted">Alt+C</kbd> 
+                  <span>for chat</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </motion.div>
