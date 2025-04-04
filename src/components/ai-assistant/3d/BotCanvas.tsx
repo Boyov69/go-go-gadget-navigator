@@ -95,7 +95,7 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
           height={300}
         />
         <ChromaticAberration 
-          offset={[0.0005, 0.0005]} 
+          offset={new THREE.Vector2(0.0005, 0.0005)} 
         />
       </EffectComposer>
       
