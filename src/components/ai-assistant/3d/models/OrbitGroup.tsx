@@ -1,10 +1,8 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import RocketModel from './RocketModel';
-import FlyingSaucerModel from './FlyingSaucerModel';
-import { Stars } from '@react-three/drei';
+import { Trail } from '@react-three/drei';
 
 interface OrbitGroupProps {
   isProcessing: boolean;
@@ -13,102 +11,120 @@ interface OrbitGroupProps {
 
 const OrbitGroup: React.FC<OrbitGroupProps> = ({ isProcessing, isListening }) => {
   const orbitRef = useRef<THREE.Group>(null);
-  const rocketRef = useRef<THREE.Group>(null);
-  const saucerRef = useRef<THREE.Group>(null);
-  const orbitalTrailRef = useRef<THREE.Line>(null);
-
-  // Create orbital trail
-  const trailPoints = React.useMemo(() => {
-    const points = [];
-    for (let i = 0; i <= 64; i++) {
-      const angle = (i / 64) * Math.PI * 2;
-      const x = Math.sin(angle) * 1.5;
-      const z = Math.cos(angle) * 1.5;
-      points.push(new THREE.Vector3(x, 0, z));
-    }
-    return points;
-  }, []);
-
-  useFrame((state) => {
-    if (!orbitRef.current || !rocketRef.current || !saucerRef.current) return;
+  const rocketRef = useRef<THREE.Mesh>(null);
+  const saucerRef = useRef<THREE.Mesh>(null);
+  
+  // Fix: Change the ref type from SVGLineElement to THREE.Line
+  const orbitTrailRef = useRef<THREE.Line>(null);
+  const saucerTrailRef = useRef<THREE.Line>(null);
+  
+  // Rotation speed for orbit objects
+  const rocketSpeed = isProcessing ? 0.03 : isListening ? 0.02 : 0.01;
+  const saucerSpeed = isProcessing ? 0.02 : isListening ? 0.015 : 0.008;
+  
+  // Update the orbit animations
+  useFrame((state, delta) => {
+    if (!orbitRef.current) return;
     
-    // Orbital motion
-    orbitRef.current.rotation.y += 0.01;
-    orbitRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.2) * 0.1;
+    // Rotate the entire orbit group
+    orbitRef.current.rotation.y += 0.002;
     
-    // Rocket movement
+    // Animate rocket position along orbit
     if (rocketRef.current) {
-      // Make rocket follow a path with some vertical movement
-      rocketRef.current.rotation.y += 0.02;
-      rocketRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 1.5) * 0.1;
-    }
-    
-    // Flying saucer wobble
-    if (saucerRef.current) {
-      saucerRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 2) * 0.1;
-      saucerRef.current.rotation.z = Math.cos(state.clock.getElapsedTime() * 1.5) * 0.1;
-    }
-    
-    // Status effects - faster orbit when active
-    if (isProcessing || isListening) {
-      orbitRef.current.rotation.y += 0.01;
+      const rocketTime = state.clock.getElapsedTime() * rocketSpeed;
+      rocketRef.current.position.x = Math.sin(rocketTime) * 1.5;
+      rocketRef.current.position.z = Math.cos(rocketTime) * 1.5;
       
-      // Pulse the orbital trail when active
-      if (orbitalTrailRef.current && orbitalTrailRef.current.material instanceof THREE.LineBasicMaterial) {
-        const pulseColor = new THREE.Color();
-        pulseColor.setHSL(
-          (state.clock.getElapsedTime() * 0.1) % 1, 
-          0.7, 
-          0.5 + Math.sin(state.clock.getElapsedTime() * 5) * 0.2
-        );
-        orbitalTrailRef.current.material.color = pulseColor;
-      }
-    } else if (orbitalTrailRef.current && orbitalTrailRef.current.material instanceof THREE.LineBasicMaterial) {
-      // Default trail color
-      orbitalTrailRef.current.material.color.set(0x4466ff);
+      // Make rocket face the direction of travel
+      rocketRef.current.rotation.y = Math.atan2(
+        -Math.cos(rocketTime),
+        -Math.sin(rocketTime)
+      );
+    }
+    
+    // Animate flying saucer along a different orbit
+    if (saucerRef.current) {
+      const saucerTime = state.clock.getElapsedTime() * saucerSpeed;
+      saucerRef.current.position.x = Math.sin(saucerTime + Math.PI) * 2;
+      saucerRef.current.position.z = Math.cos(saucerTime + Math.PI) * 2;
+      // Add slight tilt and bobbing to saucer
+      saucerRef.current.rotation.y += 0.01;
+      saucerRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 0.5) * 0.1;
     }
   });
 
   return (
     <group ref={orbitRef}>
-      {/* Orbital trail */}
-      <line ref={orbitalTrailRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={trailPoints.length}
-            array={new Float32Array(trailPoints.flatMap(p => [p.x, p.y, p.z]))}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color={0x4466ff} transparent opacity={0.5} />
-      </line>
-      
-      {/* Rocket */}
-      <group ref={rocketRef} position={[0, 0, 1.5]} scale={[0.5, 0.5, 0.5]}>
-        <RocketModel />
-      </group>
-      
-      {/* Flying saucer */}
-      <group 
-        ref={saucerRef} 
-        position={[-1.2, 0.8, -0.5]} 
-        rotation={[0.5, 0.5, 0.2]} 
-        scale={[0.4, 0.4, 0.4]}
+      {/* Rocket orbit */}
+      <Trail
+        width={1.5}
+        color={isProcessing ? "#ff3e00" : isListening ? "#00a2ff" : "#4a9eff"}
+        length={5}
+        decay={5}
+        attenuation={(width) => width}
+        opacity={0.3}
       >
-        <FlyingSaucerModel />
-      </group>
+        <mesh
+          ref={rocketRef}
+          position={[1.5, 0, 0]}
+          scale={[0.1, 0.1, 0.2]}
+        >
+          <coneGeometry args={[1, 2, 8]} />
+          <meshStandardMaterial
+            color={isProcessing ? "#ff3e00" : isListening ? "#00a2ff" : "#4a9eff"}
+            emissive={isProcessing ? "#ff3e00" : isListening ? "#00a2ff" : "#4a9eff"}
+            emissiveIntensity={0.5}
+            metalness={0.8}
+            roughness={0.2}
+          />
+        </mesh>
+      </Trail>
+
+      {/* Flying saucer orbit */}
+      <Trail
+        width={1.5}
+        color={isProcessing ? "#a200ff" : isListening ? "#00ffe5" : "#00e5ff"}
+        length={5}
+        decay={5}
+        attenuation={(width) => width}
+        opacity={0.3}
+      >
+        <mesh
+          ref={saucerRef}
+          position={[2, 0, 0]}
+          scale={[0.15, 0.05, 0.15]}
+        >
+          <sphereGeometry args={[1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial
+            color={isProcessing ? "#a200ff" : isListening ? "#00ffe5" : "#00e5ff"}
+            emissive={isProcessing ? "#a200ff" : isListening ? "#00ffe5" : "#00e5ff"}
+            emissiveIntensity={0.5}
+            metalness={0.8}
+            roughness={0.2}
+          />
+        </mesh>
+      </Trail>
+
+      {/* Orbital rings for visual effect */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.45, 1.55, 64]} />
+        <meshBasicMaterial
+          color="#4080ff"
+          transparent
+          opacity={0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
       
-      {/* Space environment */}
-      <Stars 
-        radius={5} 
-        depth={10} 
-        count={500} 
-        factor={2} 
-        saturation={1}
-        fade
-        speed={1}
-      />
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.95, 2.05, 64]} />
+        <meshBasicMaterial
+          color="#40ffff"
+          transparent
+          opacity={0.15}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
     </group>
   );
 };

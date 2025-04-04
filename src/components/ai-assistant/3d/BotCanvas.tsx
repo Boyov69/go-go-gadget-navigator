@@ -1,8 +1,16 @@
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls, PerspectiveCamera, AdaptiveDpr } from '@react-three/drei';
+import { 
+  OrbitControls, 
+  PerspectiveCamera, 
+  AdaptiveDpr, 
+  Stars, 
+  Preload,
+  Effects
+} from '@react-three/drei';
+import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing';
 import BotModel from './BotModel';
 
 interface BotCanvasProps {
@@ -23,7 +31,7 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
       {/* Optimized camera setup */}
       <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={45} />
       
-      {/* Improved lighting */}
+      {/* Enhanced lighting */}
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
       <spotLight 
@@ -39,12 +47,25 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         intensity={0.7} 
       />
       
-      {/* Main bot model */}
-      <BotModel 
-        isProcessing={isProcessing} 
-        isListening={isListening} 
-        isChatOpen={isChatOpen}
-        pulseAnimation={pulseAnimation}
+      {/* Main bot model with loading fallback */}
+      <Suspense fallback={null}>
+        <BotModel 
+          isProcessing={isProcessing} 
+          isListening={isListening} 
+          isChatOpen={isChatOpen}
+          pulseAnimation={pulseAnimation}
+        />
+      </Suspense>
+      
+      {/* Background stars */}
+      <Stars 
+        radius={100} 
+        depth={50} 
+        count={5000} 
+        factor={4} 
+        saturation={0} 
+        fade 
+        speed={0.5}
       />
       
       {/* Scene fog for depth */}
@@ -54,13 +75,32 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
       <OrbitControls 
         enableZoom={false} 
         enablePan={false}
-        enableRotate={false}
-        minPolarAngle={Math.PI / 2 - 0.4}
-        maxPolarAngle={Math.PI / 2 + 0.4}
+        enableRotate={true}
+        rotateSpeed={0.2}
+        minPolarAngle={Math.PI / 2 - 0.5}
+        maxPolarAngle={Math.PI / 2 + 0.5}
+        minAzimuthAngle={-Math.PI / 4}
+        maxAzimuthAngle={Math.PI / 4}
       />
+      
+      {/* Post-processing effects */}
+      <EffectComposer>
+        <Bloom 
+          intensity={0.5} 
+          luminanceThreshold={0.1} 
+          luminanceSmoothing={0.9} 
+          height={300}
+        />
+        <ChromaticAberration 
+          offset={[0.0005, 0.0005]} 
+          radialModulation={true}
+          modulationOffset={0.5}
+        />
+      </EffectComposer>
       
       {/* Performance optimization */}
       <AdaptiveDpr pixelated />
+      <Preload all />
     </Canvas>
   );
 };

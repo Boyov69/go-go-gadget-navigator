@@ -4,6 +4,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import EarthModel from './models/EarthModel';
 import OrbitGroup from './models/OrbitGroup';
+import FlyingSaucerModel from './models/FlyingSaucerModel';
+import RocketModel from './models/RocketModel';
 
 interface BotModelProps { 
   isProcessing: boolean; 
@@ -73,6 +75,20 @@ const BotModel: React.FC<BotModelProps> = ({
       <OrbitGroup 
         isProcessing={isProcessing}
         isListening={isListening}
+      />
+      
+      {/* Add some additional flying saucers and rockets for visual interest */}
+      <FlyingSaucerModel
+        isProcessing={isProcessing}
+        isListening={isListening}
+        position={[-1.5, 0.8, -1]}
+      />
+      
+      <RocketModel
+        isProcessing={isProcessing}
+        isListening={isListening}
+        position={[1.2, -0.5, 0.5]}
+        rotation={[0.2, 1.2, 0.1]}
       />
     </group>
   );

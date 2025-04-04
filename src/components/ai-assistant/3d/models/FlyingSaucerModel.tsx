@@ -3,128 +3,144 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const FlyingSaucerModel = React.memo(() => {
-  const ringRef = useRef<THREE.Mesh>(null);
-  const windowsRef = useRef<THREE.Group>(null);
+interface FlyingSaucerModelProps {
+  isProcessing: boolean;
+  isListening: boolean;
+  position: [number, number, number];
+}
+
+const FlyingSaucerModel: React.FC<FlyingSaucerModelProps> = ({ 
+  isProcessing, 
+  isListening,
+  position
+}) => {
+  const saucerRef = useRef<THREE.Group>(null);
   const beamRef = useRef<THREE.Mesh>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
   
+  // Color based on state
+  const mainColor = isProcessing 
+    ? new THREE.Color("#a200ff") 
+    : isListening 
+      ? new THREE.Color("#00ffe5") 
+      : new THREE.Color("#00e5ff");
+  
+  // Animation for flying saucer
   useFrame(({ clock }) => {
-    // Animate the ring
-    if (ringRef.current) {
-      ringRef.current.rotation.z = clock.elapsedTime * 0.5;
+    if (saucerRef.current) {
+      // Hover animation
+      saucerRef.current.position.y = position[1] + Math.sin(clock.getElapsedTime() * 2) * 0.05;
       
-      if (ringRef.current.material instanceof THREE.MeshPhongMaterial) {
-        // Pulse the emissive intensity
-        const pulse = Math.sin(clock.elapsedTime * 4) * 0.3 + 0.7;
-        ringRef.current.material.emissiveIntensity = pulse;
-      }
+      // Rotation
+      saucerRef.current.rotation.y += 0.01;
     }
     
-    // Rotate windows
-    if (windowsRef.current) {
-      windowsRef.current.rotation.y = clock.elapsedTime * 0.3;
+    if (beamRef.current) {
+      // Pulse the tractor beam
+      const beamPulse = Math.sin(clock.getElapsedTime() * 4) * 0.5 + 0.5;
+      beamRef.current.material.opacity = 0.3 + beamPulse * 0.3;
+      beamRef.current.scale.y = 1 + beamPulse * 0.2;
+      
+      // Only show beam during processing or listening
+      beamRef.current.visible = isProcessing || isListening;
     }
     
-    // Animate beam
-    if (beamRef.current && beamRef.current.material instanceof THREE.MeshBasicMaterial) {
-      // Pulse beam opacity
-      const opacity = Math.sin(clock.elapsedTime * 2) * 0.1 + 0.2;
-      beamRef.current.material.opacity = opacity;
+    if (lightRef.current) {
+      // Pulse the light
+      const lightPulse = Math.sin(clock.getElapsedTime() * 4) * 0.5 + 0.5;
+      lightRef.current.intensity = 0.5 + lightPulse * 0.5;
     }
   });
-  
-  const flyingSaucer = React.useMemo(() => {
-    const group = new THREE.Group();
-    
-    // Saucer top
-    const topGeometry = new THREE.SphereGeometry(0.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-    const topMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x888888, 
-      metalness: 0.8,
-      roughness: 0.2
-    });
-    const top = new THREE.Mesh(topGeometry, topMaterial);
-    top.position.y = 0.05;
-    
-    // Saucer bottom
-    const bottomGeometry = new THREE.SphereGeometry(0.25, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-    const bottomMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x666666,
-      metalness: 0.8, 
-      roughness: 0.3
-    });
-    const bottom = new THREE.Mesh(bottomGeometry, bottomMaterial);
-    bottom.position.y = -0.05;
-    
-    // Windows group
-    const windowsGroup = new THREE.Group();
-    
-    // Windows
-    const windowGeometry = new THREE.SphereGeometry(0.02, 8, 8);
-    const windowMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0xffff00,
-      transparent: true,
-      opacity: 0.9
-    });
-    
-    for (let i = 0; i < 8; i++) {
-      const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      const angle = i * Math.PI/4;
-      window.position.set(
-        Math.sin(angle) * 0.2,
-        0,
-        Math.cos(angle) * 0.2
-      );
-      windowsGroup.add(window);
-    }
-    
-    group.add(top);
-    group.add(bottom);
-    group.add(windowsGroup);
-    
-    return { group, windowsGroup };
-  }, []);
 
   return (
-    <group>
-      <primitive object={flyingSaucer.group} />
-      <group ref={windowsRef}>
-        <primitive object={flyingSaucer.windowsGroup} />
-      </group>
-      
-      {/* Glowing ring */}
-      <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.25, 0.05, 16, 32]} />
-        <meshPhongMaterial 
-          color={0x44aaff}
-          transparent={true}
-          opacity={0.8}
-          emissive={0x44aaff}
-          emissiveIntensity={0.7}
+    <group ref={saucerRef} position={position} scale={[0.15, 0.15, 0.15]}>
+      {/* Main saucer body (top) */}
+      <mesh position={[0, 0.2, 0]}>
+        <sphereGeometry args={[1, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.9}
+          roughness={0.2}
+          emissive={mainColor}
+          emissiveIntensity={0.2}
         />
       </mesh>
       
-      {/* Tractor beam effect */}
-      <mesh ref={beamRef} position={[0, -0.2, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.15, 0.3, 16, 1, true]} />
-        <meshBasicMaterial 
-          color={0x88ccff} 
-          transparent={true}
-          opacity={0.2}
+      {/* Bottom part */}
+      <mesh position={[0, -0.05, 0]} rotation={[Math.PI, 0, 0]}>
+        <sphereGeometry args={[0.8, 16, 8, 0, Math.PI * 2, 0, Math.PI / 4]} />
+        <meshStandardMaterial
+          color="#888899"
+          metalness={0.7}
+          roughness={0.3}
         />
       </mesh>
       
-      {/* Beam light */}
+      {/* Cockpit dome */}
+      <mesh position={[0, 0.5, 0]}>
+        <sphereGeometry args={[0.4, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color="#aaccff"
+          metalness={0.2}
+          roughness={0.1}
+          transparent
+          opacity={0.9}
+        />
+      </mesh>
+      
+      {/* Ring around the saucer */}
+      <mesh position={[0, 0, 0]}>
+        <torusGeometry args={[1.2, 0.15, 16, 32]} />
+        <meshStandardMaterial
+          color="#aaaacc"
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </mesh>
+      
+      {/* Bottom lights */}
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <mesh 
+          key={i} 
+          position={[
+            1 * Math.cos(i * Math.PI / 3),
+            -0.2,
+            1 * Math.sin(i * Math.PI / 3)
+          ]}
+          scale={[0.1, 0.1, 0.1]}
+        >
+          <sphereGeometry />
+          <meshStandardMaterial
+            color={mainColor}
+            emissive={mainColor}
+            emissiveIntensity={2}
+          />
+        </mesh>
+      ))}
+      
+      {/* Tractor beam */}
+      <mesh ref={beamRef} position={[0, -0.5, 0]} rotation={[Math.PI, 0, 0]}>
+        <cylinderGeometry args={[0.4, 0.1, 2, 16, 1, true]} />
+        <meshBasicMaterial
+          color={mainColor}
+          transparent
+          opacity={0.3}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      
+      {/* Light source */}
       <pointLight 
-        position={[0, -0.1, 0]} 
-        color={0x88ccff}
+        ref={lightRef}
+        color={mainColor}
         intensity={0.5}
-        distance={0.5}
+        distance={5}
+        decay={2}
+        position={[0, -0.3, 0]}
       />
     </group>
   );
-});
-
-FlyingSaucerModel.displayName = 'FlyingSaucerModel';
+};
 
 export default FlyingSaucerModel;

@@ -3,129 +3,216 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const RocketModel = React.memo(() => {
-  const flameRef = useRef<THREE.Mesh>(null);
-  const flameInnerRef = useRef<THREE.Mesh>(null);
+interface RocketModelProps {
+  isProcessing: boolean;
+  isListening: boolean;
+  position: [number, number, number];
+  rotation?: [number, number, number];
+}
+
+const RocketModel: React.FC<RocketModelProps> = ({ 
+  isProcessing, 
+  isListening,
+  position,
+  rotation = [0, 0, 0]
+}) => {
+  const rocketRef = useRef<THREE.Group>(null);
+  const exhaustRef = useRef<THREE.Group>(null);
+  const engineGlowRef = useRef<THREE.PointLight>(null);
   
-  const rocket = React.useMemo(() => {
-    const group = new THREE.Group();
-    
-    // Rocket body
-    const bodyGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.5, 16);
-    const bodyMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xcccccc, 
-      metalness: 0.8,
-      roughness: 0.2,
-      envMapIntensity: 1.0
-    });
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    
-    // Rocket nose
-    const noseGeometry = new THREE.ConeGeometry(0.1, 0.2, 16);
-    const noseMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xff0000,
-      metalness: 0.5,
-      roughness: 0.3
-    });
-    const nose = new THREE.Mesh(noseGeometry, noseMaterial);
-    nose.position.y = 0.35;
-    
-    // Rocket fins
-    const finGeometry = new THREE.BoxGeometry(0.05, 0.15, 0.15);
-    const finMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x3366ff,
-      metalness: 0.6,
-      roughness: 0.2
-    });
-    
-    for (let i = 0; i < 4; i++) {
-      const fin = new THREE.Mesh(finGeometry, finMaterial);
-      fin.position.y = -0.2;
-      fin.position.x = Math.sin(i * Math.PI/2) * 0.15;
-      fin.position.z = Math.cos(i * Math.PI/2) * 0.15;
-      fin.rotation.y = i * Math.PI/2;
-      group.add(fin);
-    }
-    
-    // Windows (portholes)
-    const windowGeometry = new THREE.CircleGeometry(0.025, 16);
-    const windowMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0x88ccff, 
-      transparent: true,
-      opacity: 0.9
-    });
-    
-    for (let i = 0; i < 3; i++) {
-      const window = new THREE.Mesh(windowGeometry, windowMaterial);
-      window.position.y = 0.1 - i * 0.15;
-      window.position.x = 0.09;
-      window.rotation.y = Math.PI / 2;
-      group.add(window);
-    }
-    
-    group.add(body);
-    group.add(nose);
-    
-    return group;
-  }, []);
+  // Color based on state
+  const mainColor = isProcessing 
+    ? new THREE.Color("#ff3e00") 
+    : isListening 
+      ? new THREE.Color("#00a2ff") 
+      : new THREE.Color("#4a9eff");
   
-  // Create flames separately so they can be animated
-  useFrame(({ clock }) => {
-    if (flameRef.current) {
-      // Animate flame size
-      const flamePulse = Math.sin(clock.elapsedTime * 10) * 0.05 + 0.95;
-      flameRef.current.scale.x = flamePulse;
-      flameRef.current.scale.z = flamePulse;
+  const exhaustColor = isProcessing 
+    ? new THREE.Color("#ff7700") 
+    : isListening 
+      ? new THREE.Color("#00a2ff") 
+      : new THREE.Color("#4a9eff");
       
-      // Animate flame color
-      if (flameRef.current.material instanceof THREE.MeshBasicMaterial) {
-        const hue = 0.05 + Math.sin(clock.elapsedTime * 5) * 0.01;
-        flameRef.current.material.color.setHSL(hue, 0.9, 0.6);
-      }
+  // Animation for rocket
+  useFrame(({ clock }) => {
+    if (rocketRef.current) {
+      // Small hover animation
+      rocketRef.current.position.y = position[1] + Math.sin(clock.getElapsedTime() * 3) * 0.02;
     }
     
-    if (flameInnerRef.current && flameInnerRef.current.material instanceof THREE.MeshBasicMaterial) {
-      // Animate inner flame color
-      const brightness = 0.9 + Math.sin(clock.elapsedTime * 15) * 0.1;
-      flameInnerRef.current.material.color.setHSL(0.1, 0.9, brightness);
+    if (exhaustRef.current) {
+      // Animate exhaust particles
+      exhaustRef.current.children.forEach((child, i) => {
+        const mesh = child as THREE.Mesh;
+        
+        // Make particles move downward and fade
+        mesh.position.y -= 0.01 * (isProcessing ? 3 : isListening ? 2 : 1);
+        
+        // Reset particle when it goes too far
+        if (mesh.position.y < -0.5) {
+          mesh.position.y = 0;
+          mesh.scale.set(
+            Math.random() * 0.04 + 0.02,
+            Math.random() * 0.04 + 0.02,
+            Math.random() * 0.04 + 0.02
+          );
+          
+          // Random offset within exhaust cone
+          const angle = Math.random() * Math.PI * 2;
+          const radius = Math.random() * 0.05;
+          mesh.position.x = Math.cos(angle) * radius;
+          mesh.position.z = Math.sin(angle) * radius;
+          
+          // Material opacity
+          (mesh.material as THREE.MeshBasicMaterial).opacity = 1;
+        } else {
+          // Fade out as it moves
+          (mesh.material as THREE.MeshBasicMaterial).opacity *= 0.95;
+        }
+      });
+    }
+    
+    if (engineGlowRef.current) {
+      // Pulsate engine glow
+      const intensity = isProcessing ? 2 : isListening ? 1.5 : 1;
+      const pulse = 0.7 + Math.sin(clock.getElapsedTime() * 10) * 0.3;
+      engineGlowRef.current.intensity = intensity * pulse;
     }
   });
-  
+
   return (
-    <group>
-      <primitive object={rocket} />
-      
-      {/* Outer flame */}
-      <mesh ref={flameRef} position={[0, -0.35, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.12, 0.25, 16, 1, true]} />
-        <meshBasicMaterial 
-          color={0xff9500} 
-          transparent={true}
-          opacity={0.7}
+    <group 
+      ref={rocketRef} 
+      position={position} 
+      rotation={[rotation[0], rotation[1], rotation[2]]}
+      scale={[0.1, 0.1, 0.1]}
+    >
+      {/* Rocket body */}
+      <mesh position={[0, 0.5, 0]}>
+        <cylinderGeometry args={[0.2, 0.5, 2, 8]} />
+        <meshStandardMaterial
+          color="#dddddd"
+          metalness={0.7}
+          roughness={0.3}
         />
       </mesh>
       
-      {/* Inner flame */}
-      <mesh ref={flameInnerRef} position={[0, -0.28, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.06, 0.18, 16, 1, true]} />
-        <meshBasicMaterial 
-          color={0xffff00} 
-          transparent={true}
-          opacity={0.9}
+      {/* Rocket nose cone */}
+      <mesh position={[0, 1.75, 0]}>
+        <coneGeometry args={[0.5, 1.5, 8]} />
+        <meshStandardMaterial
+          color={mainColor}
+          metalness={0.8}
+          roughness={0.2}
+          emissive={mainColor}
+          emissiveIntensity={0.3}
         />
       </mesh>
       
-      {/* Flame glow */}
-      <pointLight 
-        position={[0, -0.35, 0]} 
-        color={0xff5500}
-        intensity={0.8}
-        distance={0.5}
+      {/* Engine section */}
+      <mesh position={[0, -0.5, 0]}>
+        <cylinderGeometry args={[0.5, 0.6, 1, 8]} />
+        <meshStandardMaterial
+          color="#999999"
+          metalness={0.8}
+          roughness={0.3}
+        />
+      </mesh>
+      
+      {/* Engine nozzle */}
+      <mesh position={[0, -1.2, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.4, 0.6, 8]} />
+        <meshStandardMaterial
+          color="#555555"
+          metalness={0.9}
+          roughness={0.4}
+        />
+      </mesh>
+      
+      {/* Fins (4 of them) */}
+      {[0, 1, 2, 3].map((i) => (
+        <mesh 
+          key={i} 
+          position={[
+            0.5 * Math.cos(i * Math.PI / 2),
+            -0.3,
+            0.5 * Math.sin(i * Math.PI / 2)
+          ]}
+          rotation={[0, (i * Math.PI / 2) + Math.PI / 4, 0]}
+        >
+          <boxGeometry args={[0.7, 0.7, 0.05]} />
+          <meshStandardMaterial
+            color={mainColor}
+            metalness={0.7}
+            roughness={0.3}
+          />
+        </mesh>
+      ))}
+      
+      {/* Windows/lights */}
+      {[0, 1, 2, 3].map((i) => (
+        <mesh 
+          key={i} 
+          position={[
+            0.35 * Math.cos(i * Math.PI / 2),
+            0.5,
+            0.35 * Math.sin(i * Math.PI / 2)
+          ]}
+          rotation={[0, i * Math.PI / 2, 0]}
+          scale={[0.15, 0.15, 0.05]}
+        >
+          <boxGeometry />
+          <meshStandardMaterial
+            color="#aaccff"
+            emissive="#aaccff"
+            emissiveIntensity={0.5}
+            transparent
+            opacity={0.9}
+          />
+        </mesh>
+      ))}
+      
+      {/* Engine glow */}
+      <pointLight
+        ref={engineGlowRef}
+        position={[0, -1.5, 0]}
+        color={exhaustColor}
+        intensity={1.5}
+        distance={5}
+        decay={2}
       />
+      
+      {/* Exhaust particles */}
+      <group ref={exhaustRef}>
+        {Array.from({ length: 15 }).map((_, i) => {
+          const scale = Math.random() * 0.04 + 0.02;
+          const yPos = -Math.random() * 0.5 - 1.2;
+          const angle = Math.random() * Math.PI * 2;
+          const radius = Math.random() * 0.05;
+          
+          return (
+            <mesh 
+              key={i} 
+              position={[
+                Math.cos(angle) * radius,
+                yPos,
+                Math.sin(angle) * radius
+              ]}
+              scale={[scale, scale, scale]}
+            >
+              <sphereGeometry />
+              <meshBasicMaterial
+                color={exhaustColor}
+                transparent
+                opacity={1 - Math.abs(yPos + 1.2) / 0.5}
+                blending={THREE.AdditiveBlending}
+              />
+            </mesh>
+          );
+        })}
+      </group>
     </group>
   );
-});
-
-RocketModel.displayName = 'RocketModel';
+};
 
 export default RocketModel;
