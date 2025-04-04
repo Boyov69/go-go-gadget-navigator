@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import BotCanvas from './3d/BotCanvas';
 import KeyboardShortcutHints from './KeyboardShortcutHints';
 import StatusIndicator from './ui/StatusIndicator';
+import { Bot } from 'lucide-react';
 
 interface AI3DButtonProps {
   onClick: () => void;
@@ -17,6 +18,21 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
   const { isProcessing, isListening } = useAI();
   const [pulseAnimation, setPulseAnimation] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
+  const [useWebGL, setUseWebGL] = useState(true);
+
+  // Monitor WebGL context and switch to fallback if needed
+  useEffect(() => {
+    const handleWebGLContextLost = () => {
+      console.log("WebGL context lost, switching to fallback mode");
+      setUseWebGL(false);
+    };
+    
+    window.addEventListener('webglcontextlost', handleWebGLContextLost);
+    
+    return () => {
+      window.removeEventListener('webglcontextlost', handleWebGLContextLost);
+    };
+  }, []);
 
   // Periodically pulse the button to draw attention
   useEffect(() => {
@@ -45,6 +61,24 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     return "Open AI Assistant (Alt+A for voice, Alt+C for chat)";
   };
 
+  // Fallback button when WebGL is not available
+  const FallbackButton = () => (
+    <motion.div
+      className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
+      whileHover={{ 
+        scale: 1.1,
+        transition: { 
+          duration: 0.2,
+          repeat: Infinity,
+          repeatType: "mirror"
+        }
+      }}
+      whileTap={{ scale: 0.95 }}
+    >
+      <Bot className="h-8 w-8 text-white" />
+    </motion.div>
+  );
+
   return (
     <motion.div
       initial={{ scale: 0.8, opacity: 0 }}
@@ -69,12 +103,16 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
               onClick={onClick}
             >
               <div className="w-full h-full rounded-full shadow-lg overflow-hidden">
-                <BotCanvas 
-                  isProcessing={isProcessing} 
-                  isListening={isListening}
-                  isChatOpen={isChatOpen}
-                  pulseAnimation={pulseAnimation}
-                />
+                {useWebGL ? (
+                  <BotCanvas 
+                    isProcessing={isProcessing} 
+                    isListening={isListening}
+                    isChatOpen={isChatOpen}
+                    pulseAnimation={pulseAnimation}
+                  />
+                ) : (
+                  <FallbackButton />
+                )}
               </div>
               
               {/* Status indicator */}

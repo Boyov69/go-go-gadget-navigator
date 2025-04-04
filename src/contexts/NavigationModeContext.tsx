@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 type NavigationMode = 'manual' | 'ai';
 
@@ -12,10 +12,22 @@ interface NavigationModeContextType {
 const NavigationModeContext = createContext<NavigationModeContextType | undefined>(undefined);
 
 export const NavigationModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<NavigationMode>('manual');
+  // Get initial mode from localStorage, default to 'manual' if not found
+  const [mode, setMode] = useState<NavigationMode>(() => {
+    const savedMode = localStorage.getItem('navigationMode') as NavigationMode | null;
+    return savedMode === 'ai' ? 'ai' : 'manual';
+  });
+
+  // Save mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('navigationMode', mode);
+  }, [mode]);
 
   const toggleMode = () => {
-    setMode(prevMode => prevMode === 'manual' ? 'ai' : 'manual');
+    setMode(prevMode => {
+      const newMode = prevMode === 'manual' ? 'ai' : 'manual';
+      return newMode;
+    });
   };
 
   return (
