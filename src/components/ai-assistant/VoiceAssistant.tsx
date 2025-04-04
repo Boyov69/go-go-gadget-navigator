@@ -4,6 +4,7 @@ import { AlertCircle, Mic, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import { useAIConfig } from '@/contexts/AIConfigContext';
 
 interface VoiceAssistantProps {
   isListening: boolean;
@@ -18,6 +19,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
 }) => {
   const [error, setError] = useState<string | null>(null);
   const [volume, setVolume] = useState(0);
+  const { config } = useAIConfig();
   
   const { start, stop, isSupported } = useSpeechRecognition({
     onResult: (transcript) => {
@@ -34,7 +36,9 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     },
     onEnd: () => {
       onListeningChange(false);
-    }
+    },
+    // Use language from config if available
+    lang: config.voice?.voice?.split('-')?.[0] || 'en-US'
   });
   
   // Audio visualization
@@ -76,7 +80,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
       }
     };
     
-    if (isListening) {
+    if (isListening && config.enableVoice) {
       setupAudioVisualization();
     }
     
@@ -85,10 +89,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
       if (microphone) microphone.disconnect();
       if (audioContext) audioContext.close();
     };
-  }, [isListening]);
+  }, [isListening, config.enableVoice]);
   
   // Start or stop the speech recognition based on isListening prop
   useEffect(() => {
+    if (!config.enableVoice) {
+      return;
+    }
+
     if (!isSupported) {
       setError('Speech recognition is not supported in this browser.');
       return;
@@ -105,7 +113,12 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     } else {
       stop();
     }
-  }, [isListening, start, stop, isSupported, onListeningChange]);
+  }, [isListening, start, stop, isSupported, onListeningChange, config.enableVoice]);
+  
+  // Don't render anything if voice is disabled
+  if (!config.enableVoice) {
+    return null;
+  }
   
   return (
     <>

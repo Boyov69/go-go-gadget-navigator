@@ -91,4 +91,28 @@ export interface AIAssistantConfig {
   providers: Record<AIProviderType, AIProviderConfig>;
   transportApis?: Record<string, TransportAPIConfig>;
   navigation?: AINavigationCapabilities;
+  // New fields
+  contextualMemory?: boolean;
+  multimodalInput?: boolean;
+  locationAware?: boolean;
+  voice?: {
+    voice: string;
+    rate: number;
+    pitch: number;
+  };
+  advanced?: {
+    debugMode: boolean;
+    logLevel: 'error' | 'warn' | 'info' | 'debug';
+    maxHistoryItems: number;
+    timeoutMs: number;
+    retryAttempts: number;
+  };
+}
+
+// Test result interface for configuration testing
+export interface TestResult {
+  name: string;
+  success: boolean;
+  message: string;
+  details?: string;
 }

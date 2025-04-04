@@ -8,6 +8,7 @@ import "./index.css";
 import { Toaster } from "./components/ui/toaster";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AIProvider } from "./contexts/AIContext";
+import { AIConfigProvider } from "./contexts/AIConfigContext";
 
 // Create a client for react-query
 const queryClient = new QueryClient();
@@ -17,10 +18,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <AIProvider>
-            <App />
-            <Toaster />
-          </AIProvider>
+          <AIConfigProvider>
+            <AIProvider>
+              <App />
+              <Toaster />
+            </AIProvider>
+          </AIConfigProvider>
         </LanguageProvider>
       </QueryClientProvider>
     </BrowserRouter>

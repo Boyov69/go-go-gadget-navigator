@@ -8,6 +8,7 @@ import { BrainCircuit } from "lucide-react";
 import { AIAssistantConfig, AIProviderType } from "@/types/aiAssistant";
 import { AIConfigService } from "@/services/ai/AIConfigService";
 import { useToast } from "@/hooks/use-toast";
+import { useAIConfig } from "@/contexts/AIConfigContext";
 
 import ConfiguratorHeader from "./ConfiguratorHeader";
 import ConfiguratorFooter from "./ConfiguratorFooter";
@@ -16,6 +17,7 @@ import ModelSettingsTab from "./ModelSettingsTab";
 import ApiKeysTab from "./ApiKeysTab";
 import FeaturesTab from "./FeaturesTab";
 import AdvancedSettingsTab from "./AdvancedSettingsTab";
+import ConfigurationTester from "./ConfigurationTester";
 
 interface AIConfiguratorContentProps {
   sidebarOpen: boolean;
@@ -26,16 +28,22 @@ const AIConfiguratorContent: React.FC<AIConfiguratorContentProps> = ({ sidebarOp
   const [activeTab, setActiveTab] = useState("general");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { config: contextConfig, updateConfig: updateContextConfig, saveConfig: saveContextConfig } = useAIConfig();
   
   // Initialize form with React Hook Form
   const form = useForm<AIAssistantConfig>({
-    defaultValues: AIConfigService.getConfig()
+    defaultValues: contextConfig
   });
   
   // Track selected model to show appropriate provider API key
   const [selectedProvider, setSelectedProvider] = useState<AIProviderType>(
     AIConfigService.getProviderForModel(form.getValues().model)
   );
+
+  // Update the form when context config changes
+  useEffect(() => {
+    form.reset(contextConfig);
+  }, [contextConfig, form]);
 
   // Update selected provider when model changes
   useEffect(() => {
@@ -52,14 +60,10 @@ const AIConfiguratorContent: React.FC<AIConfiguratorContentProps> = ({ sidebarOp
   const onSubmit = async (data: AIAssistantConfig) => {
     setSaving(true);
     try {
-      const savedConfig = AIConfigService.saveConfig(data);
-      toast({
-        title: "Configuration Saved",
-        description: "AI Assistant configuration has been updated successfully.",
-        duration: 3000,
-      });
-      // Update form with saved values
-      form.reset(savedConfig);
+      // Update the context with form data
+      updateContextConfig(data);
+      // Save to storage
+      saveContextConfig(data);
     } catch (error) {
       console.error("Error saving configuration:", error);
       toast({
@@ -77,6 +81,7 @@ const AIConfiguratorContent: React.FC<AIConfiguratorContentProps> = ({ sidebarOp
   const handleReset = () => {
     const defaultConfig = AIConfigService.resetConfig();
     form.reset(defaultConfig);
+    updateContextConfig(defaultConfig);
     toast({
       title: "Configuration Reset",
       description: "AI Assistant configuration has been reset to defaults.",
@@ -108,6 +113,7 @@ const AIConfiguratorContent: React.FC<AIConfiguratorContentProps> = ({ sidebarOp
                   <TabsTrigger value="api">API Keys</TabsTrigger>
                   <TabsTrigger value="features">Features</TabsTrigger>
                   <TabsTrigger value="advanced">Advanced</TabsTrigger>
+                  <TabsTrigger value="testing">Testing</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="general">
@@ -129,10 +135,14 @@ const AIConfiguratorContent: React.FC<AIConfiguratorContentProps> = ({ sidebarOp
                 <TabsContent value="advanced">
                   <AdvancedSettingsTab form={form} />
                 </TabsContent>
+
+                <TabsContent value="testing">
+                  <ConfigurationTester config={form.getValues()} />
+                </TabsContent>
               </Tabs>
             </CardContent>
             <ConfiguratorFooter 
-              onCancel={() => form.reset()} 
+              onCancel={() => form.reset(contextConfig)} 
               saving={saving} 
               formIsDirty={form.formState.isDirty} 
             />
