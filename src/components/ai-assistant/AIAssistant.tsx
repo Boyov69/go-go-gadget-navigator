@@ -10,6 +10,13 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Button } from '@/components/ui/button';
 import { ChatProvider } from '@/contexts/ChatContext';
 import ChatInterface from '@/components/chat/ChatInterface';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle
+} from '@/components/ui/drawer';
 
 const AIAssistant: React.FC = () => {
   const { toast } = useToast();

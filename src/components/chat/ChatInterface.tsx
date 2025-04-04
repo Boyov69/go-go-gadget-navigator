@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useChat } from '@/contexts/ChatContext';
+import { useChat, Message } from '@/contexts/ChatContext';
 import { useAI } from '@/contexts/AIContext';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
@@ -38,7 +38,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen, onClose }) => {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       content: input.trim(),
       role: 'user',
@@ -54,7 +54,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen, onClose }) => {
     try {
       const result = await AICommandProcessor.processCommand(userMessage.content);
       
-      const aiResponse = {
+      const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: result,
         role: 'assistant',
@@ -72,7 +72,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen, onClose }) => {
     } catch (error) {
       console.error('Error processing chat message:', error);
       
-      const errorMessage = {
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: "Sorry, I couldn't process that request. Please try again.",
         role: 'assistant',
