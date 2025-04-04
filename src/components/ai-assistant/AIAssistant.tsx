@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -5,16 +6,10 @@ import { useAI } from '@/contexts/AIContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
-import { 
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from '@/components/ui/drawer';
+import { Drawer } from '@/components/ui/drawer';
 import { useAssistantKeyboardShortcuts } from '@/hooks/useAssistantKeyboardShortcuts';
 
 // Component imports
-import VoiceAssistant from './VoiceAssistant';
 import AIAssistantButton from './AIAssistantButton';
 import ChatInterface from '@/components/chat/ChatInterface';
 import AssistantDrawer from './AssistantDrawer';
@@ -26,7 +21,8 @@ const AIAssistant: React.FC = () => {
     isProcessing, setIsProcessing, 
     lastCommand, setLastCommand, 
     commandHistory, addToHistory,
-    isListening, setIsListening
+    isListening, setIsListening,
+    preferredMode, setPreferredMode
   } = useAI();
   
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +37,7 @@ const AIAssistant: React.FC = () => {
     setIsChatOpen
   });
   
+  // Process commands from voice assistant
   const handleCommandProcessed = async (command: string) => {
     setLastCommand(command);
     setIsProcessing(true);
@@ -74,6 +71,25 @@ const AIAssistant: React.FC = () => {
       window.speechSynthesis.cancel();
     }
   }, [isOpen]);
+
+  // Update preferred mode based on user interaction
+  useEffect(() => {
+    if (isOpen && !isChatOpen) {
+      setPreferredMode('voice');
+    } else if (isChatOpen && !isOpen) {
+      setPreferredMode('chat');
+    }
+  }, [isOpen, isChatOpen, setPreferredMode]);
+
+  // Show initial interface based on preferred mode
+  useEffect(() => {
+    const initialDelay = setTimeout(() => {
+      if (preferredMode === 'chat' && !isChatOpen && !isOpen) {
+        setIsChatOpen(true);
+      }
+    }, 1000);
+    return () => clearTimeout(initialDelay);
+  }, [preferredMode, isChatOpen, isOpen]);
 
   const handleButtonClick = () => {
     // Toggle between chat and voice modes
@@ -110,6 +126,7 @@ const AIAssistant: React.FC = () => {
             commandHistory={commandHistory}
             onListeningChange={setIsListening}
             isListening={isListening}
+            onCommandProcessed={handleCommandProcessed}
           />
         </Drawer>
       </ChatProvider>

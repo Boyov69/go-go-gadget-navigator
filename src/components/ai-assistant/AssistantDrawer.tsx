@@ -2,13 +2,14 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, X } from 'lucide-react';
+import { Mic, X, MessageSquare } from 'lucide-react';
 import { useAI } from '@/contexts/AIContext';
 import VoiceAssistant from './VoiceAssistant';
 import {
   DrawerContent,
   DrawerHeader,
-  DrawerTitle
+  DrawerTitle,
+  DrawerFooter
 } from '@/components/ui/drawer';
 
 interface AssistantDrawerProps {
@@ -20,6 +21,7 @@ interface AssistantDrawerProps {
   commandHistory: string[];
   onListeningChange: (isListening: boolean) => void;
   isListening: boolean;
+  onCommandProcessed: (command: string) => void;
 }
 
 const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
@@ -30,24 +32,49 @@ const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
   isProcessing,
   commandHistory,
   onListeningChange,
-  isListening
+  isListening,
+  onCommandProcessed
 }) => {
+  const { preferredMode } = useAI();
+  
+  const handleSwitchToChat = () => {
+    setIsOpen(false);
+    // The chat interface will be opened in the AIAssistant component
+    setTimeout(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'c',
+        altKey: true
+      }));
+    }, 300);
+  };
+
   return (
     <DrawerContent className="h-[80vh]">
       <DrawerHeader>
         <DrawerTitle className="text-xl flex items-center justify-between">
           <span>AI Navigation Assistant</span>
-          <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} aria-label="Close">
-            <X className="size-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleSwitchToChat} 
+              className="flex items-center gap-1"
+            >
+              <MessageSquare className="size-4" />
+              <span>Chat Mode</span>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} aria-label="Close">
+              <X className="size-4" />
+            </Button>
+          </div>
         </DrawerTitle>
       </DrawerHeader>
       
-      <div className="px-4 pb-4 space-y-4">
+      <div className="px-4 pb-4 space-y-4 overflow-y-auto">
         <VoiceAssistant 
           isListening={isListening} 
           onListeningChange={onListeningChange}
-          onCommandProcessed={() => {}}
+          onCommandProcessed={onCommandProcessed}
         />
         
         {lastCommand && (
@@ -112,6 +139,20 @@ const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
           </Card>
         )}
       </div>
+      
+      <DrawerFooter className="border-t pt-2">
+        <div className="flex justify-center w-full">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleSwitchToChat}
+            className="flex items-center gap-1 w-full sm:w-auto"
+          >
+            <MessageSquare className="size-4" />
+            <span>Switch to Chat Interface</span>
+          </Button>
+        </div>
+      </DrawerFooter>
     </DrawerContent>
   );
 };
