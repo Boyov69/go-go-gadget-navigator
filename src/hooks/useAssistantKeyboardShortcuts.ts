@@ -21,13 +21,13 @@ export const useAssistantKeyboardShortcuts = ({
         if (isChatOpen) {
           setIsChatOpen(false);
         } else {
-          setIsOpen(prev => !prev);
+          setIsOpen(!isOpen);
         }
       }
       
       // Alt+C to toggle Chat Interface
       if (e.altKey && e.key === 'c') {
-        setIsChatOpen(prev => !prev);
+        setIsChatOpen(!isChatOpen);
         if (isOpen) setIsOpen(false);
       }
       
