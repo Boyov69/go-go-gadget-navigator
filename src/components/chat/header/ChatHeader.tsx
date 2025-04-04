@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Bot, Sparkles, ArrowLeft, X } from 'lucide-react';
+import { Bot, Sparkles } from 'lucide-react';
 import { CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import ChatHeaderButtons from './ChatHeaderButtons';
 
 interface ChatHeaderProps {
   onClose: () => void;
@@ -28,14 +28,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onClose, handleClearChat }) => 
             </TooltipContent>
           </Tooltip>
         </CardTitle>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={handleClearChat} aria-label="Clear chat">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        
+        <ChatHeaderButtons 
+          onClear={handleClearChat}
+          onClose={onClose}
+        />
       </div>
     </CardHeader>
   );
