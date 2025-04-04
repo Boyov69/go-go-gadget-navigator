@@ -10,7 +10,7 @@ import { Drawer } from '@/components/ui/drawer';
 import { useAssistantKeyboardShortcuts } from '@/hooks/useAssistantKeyboardShortcuts';
 
 // Component imports
-import AIAssistantButton from './AIAssistantButton';
+import AI3DButton from './AI3DButton';
 import ChatInterface from '@/components/chat/ChatInterface';
 import AssistantDrawer from './AssistantDrawer';
 
@@ -106,8 +106,8 @@ const AIAssistant: React.FC = () => {
   return (
     <ErrorBoundary>
       <ChatProvider>
-        {/* Floating assistant button */}
-        <AIAssistantButton 
+        {/* 3D floating assistant button */}
+        <AI3DButton 
           onClick={handleButtonClick} 
           isOpen={isOpen} 
           isChatOpen={isChatOpen} 
