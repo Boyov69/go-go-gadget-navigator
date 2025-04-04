@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AIContextType {
@@ -8,6 +9,8 @@ interface AIContextType {
   commandHistory: string[];
   addToHistory: (command: string) => void;
   clearHistory: () => void;
+  isListening: boolean;
+  setIsListening: (value: boolean) => void;
 }
 
 const AIContext = createContext<AIContextType | undefined>(undefined);
@@ -16,6 +19,7 @@ export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastCommand, setLastCommand] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [isListening, setIsListening] = useState(false);
 
   const addToHistory = (command: string) => {
     setCommandHistory(prev => {
@@ -40,7 +44,9 @@ export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       setLastCommand,
       commandHistory,
       addToHistory,
-      clearHistory
+      clearHistory,
+      isListening,
+      setIsListening
     }}>
       {children}
     </AIContext.Provider>

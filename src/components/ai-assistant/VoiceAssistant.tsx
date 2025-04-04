@@ -1,10 +1,11 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { AlertCircle, Mic, Volume2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertCircle, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useAIConfig } from '@/contexts/AIConfigContext';
+import { useAI } from '@/contexts/AIContext';
 
 interface VoiceAssistantProps {
   isListening: boolean;
@@ -20,6 +21,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [volume, setVolume] = useState(0);
   const { config } = useAIConfig();
+  const { setIsListening } = useAI();
   
   const { start, stop, isSupported } = useSpeechRecognition({
     onResult: (transcript) => {
@@ -27,15 +29,18 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
         onCommandProcessed(transcript);
         // Auto-stop listening after a command is recognized
         onListeningChange(false);
+        setIsListening(false);
       }
     },
     onError: (errorMsg) => {
       console.error('Speech recognition error', errorMsg);
       setError(`Speech recognition error: ${errorMsg}`);
       onListeningChange(false);
+      setIsListening(false);
     },
     onEnd: () => {
       onListeningChange(false);
+      setIsListening(false);
     },
     // Use language from config if available
     lang: config.voice?.voice?.split('-')?.[0] || 'en-US'
@@ -107,13 +112,14 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
       if (!started) {
         setError('Failed to start speech recognition. Please try again.');
         onListeningChange(false);
+        setIsListening(false);
       } else {
         setError(null);
       }
     } else {
       stop();
     }
-  }, [isListening, start, stop, isSupported, onListeningChange, config.enableVoice]);
+  }, [isListening, start, stop, isSupported, onListeningChange, config.enableVoice, setIsListening]);
   
   // Don't render anything if voice is disabled
   if (!config.enableVoice) {

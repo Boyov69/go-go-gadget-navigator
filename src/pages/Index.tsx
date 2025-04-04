@@ -10,6 +10,8 @@ import LeftSidebar from "@/components/dashboard/LeftSidebar";
 import MainContent from "@/components/dashboard/MainContent";
 import RightSidebar from "@/components/dashboard/RightSidebar";
 import AIAssistant from "@/components/ai-assistant/AIAssistant";
+import AIFeatureShowcase from "@/components/ai-features/AIFeatureShowcase";
+import AIWelcomeBanner from "@/components/ai-features/AIWelcomeBanner";
 
 const Index: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -53,6 +55,9 @@ const Index: React.FC = () => {
         </Navbar>
         
         <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 pb-20 md:pb-6">
+          {/* AI Welcome Banner */}
+          <AIWelcomeBanner />
+          
           {/* Quick Tools at the top - more visible */}
           <div className="mb-6">
             <QuickTools />
@@ -60,6 +65,11 @@ const Index: React.FC = () => {
 
           {/* User Login/Info Section */}
           <UserLoginSection />
+
+          {/* AI Feature Showcase */}
+          <div className="mb-6">
+            <AIFeatureShowcase />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left column */}

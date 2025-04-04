@@ -1,15 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import VoiceAssistant from './VoiceAssistant';
+import AIAssistantButton from './AIAssistantButton';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { RocketIcon, Mic, X, Compass } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { useAI } from '@/contexts/AIContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Button } from '@/components/ui/button';
 
 const AIAssistant: React.FC = () => {
   const { toast } = useToast();
@@ -17,11 +18,11 @@ const AIAssistant: React.FC = () => {
   const { 
     isProcessing, setIsProcessing, 
     lastCommand, setLastCommand, 
-    commandHistory, addToHistory 
+    commandHistory, addToHistory,
+    isListening, setIsListening
   } = useAI();
   
   const [isOpen, setIsOpen] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [response, setResponse] = useState<string>('');
   
   const handleCommandProcessed = async (command: string) => {
@@ -78,19 +79,10 @@ const AIAssistant: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      {/* Floating assistant trigger button */}
+      {/* Floating assistant button */}
+      <AIAssistantButton onClick={() => setIsOpen(true)} isOpen={isOpen} />
+      
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerTrigger asChild>
-          <Button 
-            className="fixed bottom-24 right-6 rounded-full shadow-lg size-14 z-50"
-            variant="default"
-            aria-label="Open AI Assistant"
-            title="Open AI Assistant (Alt+A)"
-          >
-            <RocketIcon className="size-6" />
-          </Button>
-        </DrawerTrigger>
-        
         <DrawerContent className="h-[80vh]">
           <DrawerHeader>
             <DrawerTitle className="text-xl flex items-center justify-between">
