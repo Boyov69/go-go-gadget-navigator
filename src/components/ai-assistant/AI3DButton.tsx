@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAI } from '@/contexts/AIContext';
@@ -20,7 +19,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
   const [showHints, setShowHints] = useState(true);
   const [useWebGL, setUseWebGL] = useState(true);
 
-  // Monitor WebGL context and switch to fallback if needed
   useEffect(() => {
     const handleWebGLContextLost = () => {
       console.log("WebGL context lost, switching to fallback mode");
@@ -34,7 +32,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     };
   }, []);
 
-  // Periodically pulse the button to draw attention
   useEffect(() => {
     if (isOpen || isProcessing || isListening) return;
     
@@ -46,7 +43,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     return () => clearInterval(interval);
   }, [isOpen, isProcessing, isListening]);
 
-  // Hide the tooltip after 5 seconds
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowTooltip(false);
@@ -55,7 +51,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     return () => clearTimeout(timeout);
   }, []);
   
-  // Hide the keyboard shortcuts info after 10 seconds or on interaction
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowHints(false);
@@ -70,13 +65,11 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
     return "Open AI Assistant (Alt+A for voice, Alt+C for chat)";
   };
 
-  // Handle click and hide shortcuts
   const handleButtonClick = () => {
     setShowHints(false);
     onClick();
   };
 
-  // Fallback button when WebGL is not available
   const FallbackButton = () => (
     <motion.div
       className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
@@ -99,13 +92,13 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed top-4 right-4 z-50"
+      className="fixed top-4 right-4 z-50 w-14 h-14"
     >
       <div className="relative">
         <Tooltip open={showTooltip}>
           <TooltipTrigger asChild>
             <motion.div
-              className="w-14 h-14 cursor-pointer"
+              className="w-full h-full cursor-pointer"
               whileHover={{ 
                 scale: 1.1,
                 transition: { 
@@ -130,7 +123,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
                 )}
               </div>
               
-              {/* Status indicator */}
               <StatusIndicator active={isProcessing || isListening} />
             </motion.div>
           </TooltipTrigger>
@@ -141,7 +133,6 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
           </TooltipContent>
         </Tooltip>
         
-        {/* Keyboard shortcut hints */}
         <AnimatePresence>
           {showHints && !isOpen && !isChatOpen && (
             <motion.div 
