@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +5,12 @@ import { useAI } from '@/contexts/AIContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
-import { Drawer } from '@/components/ui/drawer';
+import { 
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle
+} from '@/components/ui/drawer';
 import { useAssistantKeyboardShortcuts } from '@/hooks/useAssistantKeyboardShortcuts';
 
 // Component imports
@@ -87,7 +91,11 @@ const AIAssistant: React.FC = () => {
     <ErrorBoundary>
       <ChatProvider>
         {/* Floating assistant button */}
-        <AIAssistantButton onClick={handleButtonClick} isOpen={isOpen || isChatOpen} />
+        <AIAssistantButton 
+          onClick={handleButtonClick} 
+          isOpen={isOpen} 
+          isChatOpen={isChatOpen} 
+        />
         
         {/* Chat Interface */}
         <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
