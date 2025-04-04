@@ -114,7 +114,10 @@ const AIAssistant: React.FC = () => {
         />
         
         {/* Chat Interface */}
-        <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+        <ChatInterface 
+          isOpen={isChatOpen} 
+          onClose={() => setIsChatOpen(false)} 
+        />
         
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
           <AssistantDrawer 

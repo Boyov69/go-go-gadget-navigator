@@ -112,6 +112,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen, onClose }) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    } else if (e.key === 'Escape') {
+      onClose();
     }
   };
 
@@ -120,6 +122,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen, onClose }) => {
     setShowEmptyState(true);
     setShowWelcome(true);
   };
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>

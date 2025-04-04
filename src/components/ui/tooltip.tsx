@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils"
 
 const TooltipProvider = TooltipPrimitive.Provider
 
-const Tooltip = TooltipPrimitive.Root
+const Tooltip = ({ children, ...props }: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>) => (
+  <TooltipProvider>
+    <TooltipPrimitive.Root {...props}>
+      {children}
+    </TooltipPrimitive.Root>
+  </TooltipProvider>
+)
 
 const TooltipTrigger = TooltipPrimitive.Trigger
 
