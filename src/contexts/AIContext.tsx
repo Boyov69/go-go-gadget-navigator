@@ -11,6 +11,8 @@ interface AIContextType {
   clearHistory: () => void;
   isListening: boolean;
   setIsListening: (value: boolean) => void;
+  preferredMode: 'chat' | 'voice';
+  setPreferredMode: (mode: 'chat' | 'voice') => void;
 }
 
 const AIContext = createContext<AIContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [lastCommand, setLastCommand] = useState('');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [isListening, setIsListening] = useState(false);
+  const [preferredMode, setPreferredMode] = useState<'chat' | 'voice'>('voice');
 
   const addToHistory = (command: string) => {
     setCommandHistory(prev => {
@@ -46,7 +49,9 @@ export const AIProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       addToHistory,
       clearHistory,
       isListening,
-      setIsListening
+      setIsListening,
+      preferredMode,
+      setPreferredMode
     }}>
       {children}
     </AIContext.Provider>
