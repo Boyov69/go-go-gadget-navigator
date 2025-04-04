@@ -1,8 +1,19 @@
-# Welcome to your Lovable project
+# Go-Go AI Navigator
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/5cd65f40-9ded-4857-a292-31583d911f2a
+
+## Overview
+
+Go-Go AI Navigator is an advanced, AI-powered navigation and travel companion application. Leveraging cutting-edge artificial intelligence, the app provides intelligent routing, personalized recommendations, and seamless travel assistance.
+
+## Key Features
+
+- AI-powered route optimization
+- Voice-enabled navigation
+- Intelligent travel recommendations
+- Real-time traffic and service insights
 
 ## How can I edit this code?
 

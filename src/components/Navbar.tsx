@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
           </Button>
           <Link to="/" className="flex items-center gap-2">
             <Map className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-primary hidden sm:inline">Go-Go</span>
+            <span className="text-xl font-bold text-primary hidden sm:inline">Go-Go AI</span>
             <span className="text-xl font-light hidden md:inline">Navigator</span>
           </Link>
         </div>
@@ -65,3 +65,4 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, children }) => {
 };
 
 export default Navbar;
+
