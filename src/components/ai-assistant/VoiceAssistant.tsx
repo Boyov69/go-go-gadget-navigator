@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AlertCircle, Mic, Volume2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 interface VoiceAssistantProps {
   isListening: boolean;
@@ -15,9 +16,26 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
   onListeningChange,
   onCommandProcessed 
 }) => {
-  const recognitionRef = useRef<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [volume, setVolume] = useState(0);
+  
+  const { start, stop, isSupported } = useSpeechRecognition({
+    onResult: (transcript) => {
+      if (transcript) {
+        onCommandProcessed(transcript);
+        // Auto-stop listening after a command is recognized
+        onListeningChange(false);
+      }
+    },
+    onError: (errorMsg) => {
+      console.error('Speech recognition error', errorMsg);
+      setError(`Speech recognition error: ${errorMsg}`);
+      onListeningChange(false);
+    },
+    onEnd: () => {
+      onListeningChange(false);
+    }
+  });
   
   // Audio visualization
   useEffect(() => {
@@ -69,72 +87,25 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({
     };
   }, [isListening]);
   
+  // Start or stop the speech recognition based on isListening prop
   useEffect(() => {
-    // Initialize speech recognition
-    const SpeechRecognition = (window as any).SpeechRecognition || 
-                            (window as any).webkitSpeechRecognition;
-    
-    if (!SpeechRecognition) {
+    if (!isSupported) {
       setError('Speech recognition is not supported in this browser.');
       return;
     }
     
-    if (!recognitionRef.current) {
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
-      
-      recognitionRef.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        onCommandProcessed(transcript);
-        // Auto-stop listening after a command is recognized
-        onListeningChange(false);
-      };
-      
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
-        setError(`Speech recognition error: ${event.error}`);
-        onListeningChange(false);
-      };
-      
-      recognitionRef.current.onend = () => {
-        onListeningChange(false);
-      };
-    }
-  }, [onCommandProcessed, onListeningChange]);
-  
-  // Start or stop the speech recognition based on isListening prop
-  useEffect(() => {
-    if (!recognitionRef.current) return;
-    
     if (isListening) {
-      try {
-        recognitionRef.current.start();
-        setError(null);
-      } catch (e) {
-        console.error('Failed to start recognition', e);
+      const started = start();
+      if (!started) {
         setError('Failed to start speech recognition. Please try again.');
         onListeningChange(false);
+      } else {
+        setError(null);
       }
     } else {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {
-        // Ignore errors when stopping (might not be active)
-      }
+      stop();
     }
-    
-    return () => {
-      if (recognitionRef.current && isListening) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {
-          // Ignore errors when stopping
-        }
-      }
-    };
-  }, [isListening, onListeningChange]);
+  }, [isListening, start, stop, isSupported, onListeningChange]);
   
   return (
     <>

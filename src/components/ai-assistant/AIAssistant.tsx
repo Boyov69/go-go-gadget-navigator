@@ -2,30 +2,36 @@
 import React, { useState, useEffect } from 'react';
 import VoiceAssistant from './VoiceAssistant';
 import { AICommandProcessor } from '@/services/ai/AICommandProcessor';
-import { AIMonitoringService } from '@/services/ai/AIMonitoringService';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { RocketIcon, Mic, X, Compass } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
+import { useAI } from '@/contexts/AIContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const AIAssistant: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { 
+    isProcessing, setIsProcessing, 
+    lastCommand, setLastCommand, 
+    commandHistory, addToHistory 
+  } = useAI();
+  
   const [isOpen, setIsOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [latestCommand, setLatestCommand] = useState<string>('');
   const [response, setResponse] = useState<string>('');
-  const [isProcessing, setIsProcessing] = useState(false);
   
   const handleCommandProcessed = async (command: string) => {
-    setLatestCommand(command);
+    setLastCommand(command);
     setIsProcessing(true);
     
     try {
       const result = await AICommandProcessor.processCommand(command);
       setResponse(result);
+      addToHistory(command);
       
       // Speak the response (optional text-to-speech)
       if ('speechSynthesis' in window) {
@@ -71,7 +77,7 @@ const AIAssistant: React.FC = () => {
   }, [isOpen]);
 
   return (
-    <>
+    <ErrorBoundary>
       {/* Floating assistant trigger button */}
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTrigger asChild>
@@ -102,11 +108,11 @@ const AIAssistant: React.FC = () => {
               onCommandProcessed={handleCommandProcessed}
             />
             
-            {latestCommand && (
+            {lastCommand && (
               <Card className="bg-muted/50">
                 <CardContent className="pt-4">
                   <p className="text-sm text-muted-foreground">I heard:</p>
-                  <p className="font-medium">{latestCommand}</p>
+                  <p className="font-medium">{lastCommand}</p>
                 </CardContent>
               </Card>
             )}
@@ -150,10 +156,23 @@ const AIAssistant: React.FC = () => {
                 </ul>
               </CardContent>
             </Card>
+            
+            {commandHistory.length > 0 && (
+              <Card>
+                <CardContent className="pt-4">
+                  <h4 className="text-sm font-semibold mb-2">Recent commands:</h4>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    {commandHistory.slice().reverse().slice(0, 5).map((cmd, i) => (
+                      <li key={i} className="truncate">{cmd}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
-    </>
+    </ErrorBoundary>
   );
 };
 
