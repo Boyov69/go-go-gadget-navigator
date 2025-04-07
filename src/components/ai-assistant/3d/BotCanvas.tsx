@@ -70,7 +70,10 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         />
         
         {/* Earth in the background */}
-        <EarthModel />
+        <EarthModel 
+          emissiveIntensity={0.2}
+          cloudOpacity={0.5}
+        />
         
         {/* Orbiting elements */}
         <OrbitGroup 
@@ -98,7 +101,9 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         {/* Post-processing effects */}
         <EffectComposer>
           <ChromaticAberration 
-            offset={new Vector2(0.0005, 0.0005)} 
+            offset={new Vector2(0.0005, 0.0005)}
+            radialModulation={false}
+            modulationOffset={0}
           />
           <Bloom 
             intensity={0.2} 

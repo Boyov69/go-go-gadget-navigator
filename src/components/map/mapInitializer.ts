@@ -67,10 +67,8 @@ export const createMapInstance = (
     mapTypeControl: options.showControls,
     fullscreenControl: options.showControls,
     styles: options.mapStyle || [],
-    // Use correct property for Street View controls
-    streetViewControlOptions: {
-      position: options.showControls ? google.maps.ControlPosition.RIGHT_TOP : undefined
-    }
+    // Fix street view controls to use proper API
+    streetViewControl: options.showControls
   };
   
   const map = new google.maps.Map(mapElement, mapOptions);

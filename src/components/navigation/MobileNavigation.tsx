@@ -28,30 +28,30 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ navItems }) => {
       <Drawer>
         <div className="grid grid-cols-5 h-16">
           {/* Show first 4 most important navigation items */}
-          {navItems.slice(0, 4).map((item) => (
-            <Button
-              key={item.value}
-              variant="ghost"
-              onClick={() => handleNavigate(item.path)}
-              className={cn(
-                "h-full rounded-none flex flex-col gap-1 items-center justify-center",
-                location.pathname === item.path && "bg-primary/10"
-              )}
-              aria-label={item.label}
-            >
-              {React.isValidElement(item.icon) ? 
-                React.cloneElement(item.icon as React.ReactElement, { 
-                  'aria-hidden': true,
-                  className: cn(
-                    item.icon.props.className,
+          {navItems.slice(0, 4).map((item) => {
+            const Icon = item.icon;
+            return (
+              <Button
+                key={item.value}
+                variant="ghost"
+                onClick={() => handleNavigate(item.path)}
+                className={cn(
+                  "h-full rounded-none flex flex-col gap-1 items-center justify-center",
+                  location.pathname === item.path && "bg-primary/10"
+                )}
+                aria-label={item.label}
+              >
+                <Icon 
+                  className={cn(
+                    "h-4 w-4",
                     location.pathname === item.path && "text-primary"
-                  )
-                }) : 
-                item.icon
-              }
-              <span className="text-xs">{item.label}</span>
-            </Button>
-          ))}
+                  )} 
+                  aria-hidden="true"
+                />
+                <span className="text-xs">{item.label}</span>
+              </Button>
+            );
+          })}
           
           {/* More button opens drawer with all options */}
           <DrawerTrigger asChild>
@@ -81,36 +81,36 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ navItems }) => {
         <DrawerContent className="max-h-[50vh]" role="dialog" aria-label="Navigation options">
           <ScrollArea className="h-full max-h-[calc(50vh-2rem)] p-4">
             <div className="grid grid-cols-4 gap-4 p-4" role="menu">
-              {navItems.map((item) => (
-                <Button
-                  key={item.value}
-                  variant="ghost"
-                  onClick={() => handleNavigate(item.path)}
-                  className={cn(
-                    "flex flex-col gap-2 h-auto py-4 items-center justify-center",
-                    location.pathname === item.path && "bg-primary/10"
-                  )}
-                  role="menuitem"
-                  aria-label={item.label}
-                >
-                  <div className={cn(
-                    "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center",
-                    location.pathname === item.path && "bg-primary/20"
-                  )}>
-                    {React.isValidElement(item.icon) ? 
-                      React.cloneElement(item.icon as React.ReactElement, { 
-                        'aria-hidden': true,
-                        className: cn(
-                          item.icon.props.className,
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.value}
+                    variant="ghost"
+                    onClick={() => handleNavigate(item.path)}
+                    className={cn(
+                      "flex flex-col gap-2 h-auto py-4 items-center justify-center",
+                      location.pathname === item.path && "bg-primary/10"
+                    )}
+                    role="menuitem"
+                    aria-label={item.label}
+                  >
+                    <div className={cn(
+                      "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center",
+                      location.pathname === item.path && "bg-primary/20"
+                    )}>
+                      <Icon 
+                        className={cn(
+                          "h-4 w-4",
                           location.pathname === item.path && "text-primary"
-                        )
-                      }) : 
-                      item.icon
-                    }
-                  </div>
-                  <span className="text-xs font-medium">{item.label}</span>
-                </Button>
-              ))}
+                        )}
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </Button>
+                );
+              })}
             </div>
           </ScrollArea>
         </DrawerContent>
