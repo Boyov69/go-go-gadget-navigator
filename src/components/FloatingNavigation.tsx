@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   MapPin,
   Car, 
@@ -12,7 +12,6 @@ import {
   Map,
   AlertTriangle
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { ScrollArea } from "./ui/scroll-area";
@@ -22,71 +21,73 @@ interface NavItem {
   icon: React.ReactNode;
   label: string;
   value: string;
-  action: () => void;
+  path: string;
 }
 
 const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   const navItems: NavItem[] = [
     {
       icon: <Map className="h-4 w-4" />,
       label: "Home",
       value: "home",
-      action: () => navigate("/")
+      path: "/"
     },
     {
       icon: <Car className="h-4 w-4" />,
       label: "Rides",
       value: "rides",
-      action: () => navigate("/")
+      path: "/"
     },
     {
       icon: <MapPin className="h-4 w-4" />,
       label: "Explore",
       value: "explore",
-      action: () => navigate("/explore")
+      path: "/explore"
     },
     {
       icon: <AlertTriangle className="h-4 w-4" />,
       label: "Road Help",
       value: "roadhelp",
-      action: () => navigate("/road-assistance")
+      path: "/road-assistance"
     },
     {
       icon: <Package className="h-4 w-4" />,
       label: "Cargo",
       value: "cargo",
-      action: () => navigate("/cargo")
+      path: "/cargo"
     },
     {
       icon: <Heart className="h-4 w-4" />,
       label: "Favorites",
       value: "favorites",
-      action: () => navigate("/favorites")
+      path: "/favorites"
     },
     {
       icon: <Clock className="h-4 w-4" />,
       label: "Saved",
       value: "saved",
-      action: () => navigate("/saved-trips")
+      path: "/saved-trips"
     },
     {
       icon: <User className="h-4 w-4" />,
       label: "Providers",
       value: "providers",
-      action: () => navigate("/suppliers")
+      path: "/suppliers"
     },
     {
       icon: <Settings className="h-4 w-4" />,
       label: "Settings",
       value: "settings",
-      action: () => navigate("/settings")
+      path: "/settings"
     }
   ];
 
-  // On desktop: show a vertical navigation
-  // On mobile: show a bottom navigation bar with a drawer for more options
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
   
   return (
     <>
@@ -105,13 +106,22 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
               key={item.value}
               variant="ghost"
               size="icon"
-              onClick={item.action}
+              onClick={() => handleNavigate(item.path)}
               title={item.label}
               aria-label={item.label}
-              className="rounded-full h-10 w-10 flex items-center justify-center"
+              className={cn(
+                "rounded-full h-10 w-10 flex items-center justify-center",
+                location.pathname === item.path && "bg-primary/10"
+              )}
             >
               {React.isValidElement(item.icon) ? 
-                React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                React.cloneElement(item.icon as React.ReactElement, { 
+                  'aria-hidden': true,
+                  className: cn(
+                    item.icon.props.className,
+                    location.pathname === item.path && "text-primary"
+                  )
+                }) : 
                 item.icon
               }
               <span className="sr-only">{item.label}</span>
@@ -133,12 +143,21 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
               <Button
                 key={item.value}
                 variant="ghost"
-                onClick={item.action}
-                className="h-full rounded-none flex flex-col gap-1 items-center justify-center"
+                onClick={() => handleNavigate(item.path)}
+                className={cn(
+                  "h-full rounded-none flex flex-col gap-1 items-center justify-center",
+                  location.pathname === item.path && "bg-primary/10"
+                )}
                 aria-label={item.label}
               >
                 {React.isValidElement(item.icon) ? 
-                  React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                  React.cloneElement(item.icon as React.ReactElement, { 
+                    'aria-hidden': true,
+                    className: cn(
+                      item.icon.props.className,
+                      location.pathname === item.path && "text-primary"
+                    )
+                  }) : 
                   item.icon
                 }
                 <span className="text-xs">{item.label}</span>
@@ -177,14 +196,26 @@ const FloatingNavigation: React.FC<{className?: string}> = ({ className }) => {
                   <Button
                     key={item.value}
                     variant="ghost"
-                    onClick={item.action}
-                    className="flex flex-col gap-2 h-auto py-4 items-center justify-center"
+                    onClick={() => handleNavigate(item.path)}
+                    className={cn(
+                      "flex flex-col gap-2 h-auto py-4 items-center justify-center",
+                      location.pathname === item.path && "bg-primary/10"
+                    )}
                     role="menuitem"
                     aria-label={item.label}
                   >
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className={cn(
+                      "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center",
+                      location.pathname === item.path && "bg-primary/20"
+                    )}>
                       {React.isValidElement(item.icon) ? 
-                        React.cloneElement(item.icon as React.ReactElement, { 'aria-hidden': true }) : 
+                        React.cloneElement(item.icon as React.ReactElement, { 
+                          'aria-hidden': true,
+                          className: cn(
+                            item.icon.props.className,
+                            location.pathname === item.path && "text-primary"
+                          )
+                        }) : 
                         item.icon
                       }
                     </div>

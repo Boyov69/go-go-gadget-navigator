@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAI } from '@/contexts/AIContext';
@@ -72,7 +73,7 @@ const AI3DButton: React.FC<AI3DButtonProps> = ({ onClick, isOpen, isChatOpen = f
 
   const FallbackButton = () => (
     <motion.div
-      className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
+      className="w-full h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
       whileHover={{ 
         scale: 1.1,
         transition: { 

@@ -25,7 +25,7 @@ const FlyingSaucerModel: React.FC<FlyingSaucerModelProps> = ({
       ? new THREE.Color("#00ffe5") 
       : new THREE.Color("#00e5ff");
   
-  // Animation for flying saucer
+  // Animation for flying saucer with null checks
   useFrame(({ clock }) => {
     if (saucerRef.current) {
       // Hover animation
@@ -39,9 +39,9 @@ const FlyingSaucerModel: React.FC<FlyingSaucerModelProps> = ({
       // Pulse the tractor beam
       const beamPulse = Math.sin(clock.getElapsedTime() * 4) * 0.5 + 0.5;
       
-      // Access opacity through material property ensuring it's MeshBasicMaterial
+      // Type safety check
       const material = beamRef.current.material as THREE.MeshBasicMaterial;
-      if (material) {
+      if (material && 'opacity' in material) {
         material.opacity = 0.3 + beamPulse * 0.3;
       }
       

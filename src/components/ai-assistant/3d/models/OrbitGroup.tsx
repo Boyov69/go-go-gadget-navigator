@@ -14,15 +14,11 @@ const OrbitGroup: React.FC<OrbitGroupProps> = ({ isProcessing, isListening }) =>
   const rocketRef = useRef<THREE.Mesh>(null);
   const saucerRef = useRef<THREE.Mesh>(null);
   
-  // Fix: Change the ref type from SVGLineElement to THREE.Line
-  const orbitTrailRef = useRef<THREE.Line>(null);
-  const saucerTrailRef = useRef<THREE.Line>(null);
-  
   // Rotation speed for orbit objects
   const rocketSpeed = isProcessing ? 0.03 : isListening ? 0.02 : 0.01;
   const saucerSpeed = isProcessing ? 0.02 : isListening ? 0.015 : 0.008;
   
-  // Update the orbit animations
+  // Update the orbit animations with proper null checks
   useFrame((state, delta) => {
     if (!orbitRef.current) return;
     

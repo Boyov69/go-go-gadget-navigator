@@ -1,110 +1,129 @@
 
-import React, { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import * as THREE from 'three';
-import { 
-  OrbitControls, 
-  PerspectiveCamera, 
-  AdaptiveDpr, 
-  Stars, 
-  Preload
-} from '@react-three/drei';
-import { 
-  EffectComposer, 
-  Bloom, 
-  ChromaticAberration 
-} from '@react-three/postprocessing';
+import React, { Suspense, useRef, useEffect } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
+import { OrbitControls, Environment } from '@react-three/drei';
+import { Vector2 } from 'three';
 import BotModel from './BotModel';
+import OrbitGroup from './models/OrbitGroup';
+import EarthModel from './models/EarthModel';
+import FlyingSaucerModel from './models/FlyingSaucerModel';
+import RocketModel from './models/RocketModel';
+
+// Fix type issues with postprocessing effects
+import { EffectComposer, ChromaticAberration, Bloom, Noise, Vignette } from '@react-three/postprocessing';
+
+// Loading placeholder component
+const LoadingPlaceholder = () => (
+  <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-full">
+    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
+  </div>
+);
+
+// Camera setup component
+const CameraSetup = () => {
+  const { camera } = useThree();
+  
+  useEffect(() => {
+    camera.position.set(0, 0, 6);
+    // Prevent console errors by ensuring this effect only runs once
+  }, [camera]);
+  
+  return null;
+};
 
 interface BotCanvasProps {
   isProcessing: boolean;
   isListening: boolean;
-  isChatOpen: boolean;
-  pulseAnimation: boolean;
+  isChatOpen?: boolean;
+  pulseAnimation?: boolean;
 }
 
 const BotCanvas: React.FC<BotCanvasProps> = ({ 
   isProcessing, 
   isListening, 
-  isChatOpen, 
-  pulseAnimation 
+  isChatOpen = false,
+  pulseAnimation = false
 }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   return (
-    <Canvas dpr={[1, 2]} gl={{ antialias: true }}>
-      {/* Optimized camera setup */}
-      <PerspectiveCamera makeDefault position={[0, 0, 3]} fov={45} />
-      
-      {/* Enhanced lighting */}
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <spotLight 
-        position={[1, 1, 5]} 
-        angle={0.3} 
-        penumbra={1} 
-        intensity={1.5} 
-        castShadow 
-      />
-      <hemisphereLight 
-        color="#ffffff" 
-        groundColor="#222266" 
-        intensity={0.7} 
-      />
-      
-      {/* Main bot model with loading fallback */}
-      <Suspense fallback={null}>
+    <Suspense fallback={<LoadingPlaceholder />}>
+      <Canvas ref={canvasRef} gl={{ antialias: true, alpha: true }}>
+        <CameraSetup />
+        
+        {/* Scene lighting */}
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={0.6} />
+        <spotLight 
+          position={[5, 10, -10]} 
+          angle={0.15} 
+          penumbra={1} 
+          intensity={0.5} 
+        />
+        
+        {/* Bot model at the center */}
         <BotModel 
+          position={[0, 0, 0]} 
+          scale={[1.2, 1.2, 1.2]} 
           isProcessing={isProcessing} 
-          isListening={isListening} 
+          isListening={isListening}
           isChatOpen={isChatOpen}
           pulseAnimation={pulseAnimation}
         />
-      </Suspense>
-      
-      {/* Background stars */}
-      <Stars 
-        radius={100} 
-        depth={50} 
-        count={5000} 
-        factor={4} 
-        saturation={0} 
-        fade 
-        speed={0.5}
-      />
-      
-      {/* Scene fog for depth */}
-      <fog attach="fog" color="#000033" near={7} far={10} />
-      
-      {/* Scene controls */}
-      <OrbitControls 
-        enableZoom={false} 
-        enablePan={false}
-        enableRotate={true}
-        rotateSpeed={0.2}
-        minPolarAngle={Math.PI / 2 - 0.5}
-        maxPolarAngle={Math.PI / 2 + 0.5}
-        minAzimuthAngle={-Math.PI / 4}
-        maxAzimuthAngle={Math.PI / 4}
-      />
-      
-      {/* Post-processing effects */}
-      <EffectComposer>
-        <Bloom 
-          intensity={0.5} 
-          luminanceThreshold={0.1} 
-          luminanceSmoothing={0.9} 
-          height={300}
+        
+        {/* Earth in the background */}
+        <EarthModel 
+          position={[0, 0, -2]} 
+          scale={[1, 1, 1]} 
+          isProcessing={isProcessing}
+          isListening={isListening}
         />
-        <ChromaticAberration 
-          offset={new THREE.Vector2(0.0005, 0.0005)}
-          radialModulation={false}
-          modulationOffset={0}
+        
+        {/* Orbiting elements */}
+        <OrbitGroup 
+          isProcessing={isProcessing} 
+          isListening={isListening} 
         />
-      </EffectComposer>
-      
-      {/* Performance optimization */}
-      <AdaptiveDpr pixelated />
-      <Preload all />
-    </Canvas>
+        
+        {/* Flying saucer */}
+        <FlyingSaucerModel 
+          position={[-2, 1, -1]} 
+          isProcessing={isProcessing} 
+          isListening={isListening}
+        />
+        
+        {/* Rocket */}
+        <RocketModel 
+          position={[2, -1, -1]}
+          isProcessing={isProcessing}
+          isListening={isListening}
+        />
+        
+        {/* Environment for reflective materials */}
+        <Environment preset="city" />
+        
+        {/* Post-processing effects */}
+        <EffectComposer>
+          <ChromaticAberration 
+            offset={new Vector2(0.0005, 0.0005)} 
+            radialModulation={false} 
+            modulationOffset={0}
+          />
+          <Bloom 
+            intensity={0.2} 
+            luminanceThreshold={0.8} 
+            luminanceSmoothing={0.9}
+          />
+          <Noise opacity={0.015} />
+          <Vignette eskil={false} offset={0.1} darkness={0.8} />
+        </EffectComposer>
+        
+        {/* Controls disabled in production to prevent user interaction */}
+        {process.env.NODE_ENV === 'development' && (
+          <OrbitControls enableZoom={false} enablePan={false} />
+        )}
+      </Canvas>
+    </Suspense>
   );
 };
 
