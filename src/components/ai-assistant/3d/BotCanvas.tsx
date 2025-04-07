@@ -63,8 +63,6 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         
         {/* Bot model at the center */}
         <BotModel 
-          position={[0, 0, 0]} 
-          scale={[1.2, 1.2, 1.2]} 
           isProcessing={isProcessing} 
           isListening={isListening}
           isChatOpen={isChatOpen}
@@ -73,8 +71,6 @@ const BotCanvas: React.FC<BotCanvasProps> = ({
         
         {/* Earth in the background */}
         <EarthModel 
-          position={[0, 0, -2]} 
-          scale={[1, 1, 1]} 
           isProcessing={isProcessing}
           isListening={isListening}
         />
