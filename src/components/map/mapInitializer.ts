@@ -65,9 +65,12 @@ export const createMapInstance = (
     center: options.center,
     zoom: options.zoom,
     mapTypeControl: options.showControls,
-    streetViewControl: options.showControls,
     fullscreenControl: options.showControls,
-    styles: options.mapStyle || []
+    styles: options.mapStyle || [],
+    // Use correct property for Street View controls
+    streetViewControlOptions: {
+      position: options.showControls ? google.maps.ControlPosition.RIGHT_TOP : undefined
+    }
   };
   
   const map = new google.maps.Map(mapElement, mapOptions);
