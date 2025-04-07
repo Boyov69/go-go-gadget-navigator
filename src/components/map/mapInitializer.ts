@@ -1,4 +1,3 @@
-
 // Replace direct API key exposure with a more secure approach
 // This file should be modified to get the API key from a more secure source
 // or implement proper key restrictions in Google Cloud Console
@@ -66,9 +65,8 @@ export const createMapInstance = (
     zoom: options.zoom,
     mapTypeControl: options.showControls,
     fullscreenControl: options.showControls,
+    streetViewControl: options.showControls, // Corrected property name
     styles: options.mapStyle || [],
-    // Fix street view controls to use proper API
-    streetViewControl: options.showControls
   };
   
   const map = new google.maps.Map(mapElement, mapOptions);
