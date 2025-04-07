@@ -65,7 +65,7 @@ export const createMapInstance = (
     zoom: options.zoom,
     mapTypeControl: options.showControls,
     fullscreenControl: options.showControls,
-    streetViewControl: options.showControls, // Corrected property name
+    streetViewControl: options.showControls,
     styles: options.mapStyle || [],
   };
   
