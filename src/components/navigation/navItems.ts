@@ -1,5 +1,4 @@
 
-import React from "react";
 import { 
   MapPin,
   Car, 
@@ -13,7 +12,7 @@ import {
 } from "lucide-react";
 
 export interface NavItem {
-  icon: React.ReactNode;
+  icon: React.ElementType;
   label: string;
   value: string;
   path: string;
@@ -21,55 +20,55 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   {
-    icon: <Map className="h-4 w-4" />,
+    icon: Map,
     label: "Home",
     value: "home",
     path: "/"
   },
   {
-    icon: <Car className="h-4 w-4" />,
+    icon: Car,
     label: "Rides",
     value: "rides",
     path: "/"
   },
   {
-    icon: <MapPin className="h-4 w-4" />,
+    icon: MapPin,
     label: "Explore",
     value: "explore",
     path: "/explore"
   },
   {
-    icon: <AlertTriangle className="h-4 w-4" />,
+    icon: AlertTriangle,
     label: "Road Help",
     value: "roadhelp",
     path: "/road-assistance"
   },
   {
-    icon: <Package className="h-4 w-4" />,
+    icon: Package,
     label: "Cargo",
     value: "cargo",
     path: "/cargo"
   },
   {
-    icon: <Heart className="h-4 w-4" />,
+    icon: Heart,
     label: "Favorites",
     value: "favorites",
     path: "/favorites"
   },
   {
-    icon: <Clock className="h-4 w-4" />,
+    icon: Clock,
     label: "Saved",
     value: "saved",
     path: "/saved-trips"
   },
   {
-    icon: <User className="h-4 w-4" />,
+    icon: User,
     label: "Providers",
     value: "providers",
     path: "/suppliers"
   },
   {
-    icon: <Settings className="h-4 w-4" />,
+    icon: Settings,
     label: "Settings",
     value: "settings",
     path: "/settings"
